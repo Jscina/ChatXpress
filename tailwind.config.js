@@ -17,6 +17,12 @@ export default {
       translate: {
         "w-54": "14rem",
       },
+      width: {
+        "w-4/5": "80%",
+      },
+      maxHeight: {
+        "max-h-45": "45rem",
+      },
     },
   },
   plugins: [],

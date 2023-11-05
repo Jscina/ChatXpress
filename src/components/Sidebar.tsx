@@ -1,4 +1,4 @@
-import { createEffect } from "solid-js";
+import UserProfile from "./UserProfile";
 
 interface SidebarProps {
   setSidebarOpen: (val: boolean) => void;
@@ -6,14 +6,6 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
-  createEffect(() => {
-    if (isSidebarOpen()) {
-      console.log("Sidebar is open");
-    } else {
-      console.log("Sidebar is closed");
-    }
-  });
-
   return (
     <>
       <nav
@@ -41,7 +33,9 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
         </div>
         <div class="flex-none">
           <hr />
-          <div class="flex flex-col space-y-2 p-4 mb-auto"></div>
+          <div class="flex flex-col space-y-2 p-4 mb-auto">
+            <UserProfile />
+          </div>
         </div>
       </nav>
     </>

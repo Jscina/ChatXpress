@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-500;
+  @apply bg-light text-primary-dark font-sans antialiased overflow-x-hidden;
+}
+
+.dark body {
+  @apply bg-dark text-primary-light;
 }

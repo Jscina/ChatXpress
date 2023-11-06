@@ -1,9 +1,11 @@
 import { createSignal, createEffect } from "solid-js";
+import { AIRole } from "../types";
+import type { ChatMessage } from "../types";
 
 interface ChatInputProps {
   isSidebarOpen: () => boolean;
-  message: () => string;
-  setMessage: (val: string) => void;
+  message: () => ChatMessage[];
+  setMessage: (val: ChatMessage[]) => void;
 }
 
 const ChatInput = ({ isSidebarOpen, message, setMessage }: ChatInputProps) => {
@@ -14,7 +16,9 @@ const ChatInput = ({ isSidebarOpen, message, setMessage }: ChatInputProps) => {
     const promptInput = messageRef();
 
     if (promptInput && promptInput.value !== "") {
-      setMessage(promptInput.value);
+      let messages = message();
+      messages?.push({ role: AIRole.USER, content: promptInput.value });
+      setMessage(messages);
       promptInput.value = "";
     }
   };

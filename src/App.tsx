@@ -4,10 +4,14 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
+import { AIRole, type ChatMessage } from "./types";
 
 const App = () => {
   const [isSidebarOpen, setSidebarOpen] = createSignal<boolean>(false);
-  const [message, setMessage] = createSignal<string>("");
+  // The system message will be gotten from the backend on mount.
+  const [message, setMessage] = createSignal<ChatMessage[]>([
+    { role: AIRole.SYSTEM, content: "Hello, I'm the AI." },
+  ]);
 
   return (
     <>

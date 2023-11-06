@@ -1,7 +1,8 @@
 import { createEffect } from "solid-js";
+import type { ChatMessage } from "../types";
 
 interface ChatWindowProps {
-  message: () => string;
+  message: () => ChatMessage[];
 }
 
 const ChatWindow = ({ message }: ChatWindowProps) => {

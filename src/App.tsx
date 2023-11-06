@@ -3,18 +3,11 @@ import { createSignal } from "solid-js";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
-
-{
-  /* <div class="flex items-center justify-center">
-              <div class="space-y-4 overflow-y-scroll overflow-x-hidden flex justify-center grow shadowflex flex-col shadow-lg rounded-lg transition-all duration-300 ease-in-out max-h-45 w-4/5">
-                <div class="flex flex-col w-1/2 self-center border-none rounded-lg"></div>
-              </div>
-              <div class="flex-shrink-0 w-16"></div>
-            </div> */
-}
+import ChatWindow from "./components/ChatWindow";
 
 const App = () => {
-  const [isSidebarOpen, setSidebarOpen] = createSignal(false);
+  const [isSidebarOpen, setSidebarOpen] = createSignal<boolean>(false);
+  const [message, setMessage] = createSignal<string>("");
 
   return (
     <>
@@ -27,8 +20,12 @@ const App = () => {
             : "translate-x-0"
         }`}>
         <div class="flex flex-col p-8 mt-16 h-screen justify-center items-center">
-          <div class="flex-grow justify-center overflow-auto max-h-[calc(100vh-14rem)]"></div>
-          <ChatInput isSidebarOpen={isSidebarOpen} />
+          <ChatWindow message={message} />
+          <ChatInput
+            isSidebarOpen={isSidebarOpen}
+            message={message}
+            setMessage={setMessage}
+          />
         </div>
       </main>
     </>

@@ -1,5 +1,5 @@
-import { createSignal } from "solid-js";
-// import { invoke } from "@tauri-apps/api/tauri";
+import { createSignal, onMount } from "solid-js";
+import { invoke } from "@tauri-apps/api/tauri";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
@@ -12,6 +12,12 @@ const App = () => {
   const [message, setMessage] = createSignal<ChatMessage[]>([
     { role: AIRole.SYSTEM, content: "Hello, I'm the AI." },
   ]);
+
+  const test = async () => {
+    await invoke("test");
+  };
+
+  onMount(test);
 
   return (
     <>

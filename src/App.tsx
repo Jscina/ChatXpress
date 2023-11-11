@@ -13,11 +13,13 @@ const App = () => {
     { role: AIRole.SYSTEM, content: "Hello, I'm the AI." },
   ]);
 
-  const test = async () => {
-    await invoke("test");
+  const get_history = async () => {
+    await invoke("get_history", { thread_id: null });
   };
 
-  onMount(test);
+  onMount(async () => {
+    await get_history();
+  });
 
   return (
     <>

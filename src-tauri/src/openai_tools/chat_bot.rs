@@ -3,8 +3,8 @@ use async_openai::{
     error::OpenAIError,
     types::{
         AssistantObject, AssistantTools, CreateAssistantRequestArgs, CreateMessageRequestArgs,
-        CreateRunRequestArgs, CreateThreadRequestArgs, MessageContent, RunObject, RunStatus,
-        ThreadObject,
+        CreateRunRequestArgs, CreateThreadRequestArgs, ListMessagesResponse, MessageContent,
+        RunObject, RunStatus, ThreadObject,
     },
     Client,
 };
@@ -123,6 +123,17 @@ impl ChatBot {
             }
         }
         Ok(true)
+    }
+
+    pub async fn get_history(&self, thread_id: &str) -> Result<ListMessagesResponse, OpenAIError> {
+        let query = [("limt", "100")];
+        let messages = self
+            .client
+            .threads()
+            .messages(thread_id)
+            .list(&query)
+            .await?;
+        Ok(messages)
     }
 
     pub async fn get_assistant_response(

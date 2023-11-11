@@ -1,0 +1,1 @@
+UPDATE history SET thread_name = ? where id = ? AND thread_id = ?;

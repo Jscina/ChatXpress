@@ -1,17 +1,4 @@
-import { createEffect } from "solid-js";
-import type { ChatMessage } from "../types";
-
-interface ChatWindowProps {
-  message: () => ChatMessage[];
-}
-
-const ChatWindow = ({ message }: ChatWindowProps) => {
-  createEffect(() => {
-    if (message()) {
-      console.log(message());
-    }
-  });
-
+const ChatWindow = () => {
   return (
     <>
       <div class="flex-grow justify-center overflow-auto max-h-[calc(100vh-14rem)]">

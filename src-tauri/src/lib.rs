@@ -5,6 +5,7 @@ mod openai_tools {
 
 mod commands {
     pub mod assistant;
+    pub mod schemas;
 }
 
 mod database {

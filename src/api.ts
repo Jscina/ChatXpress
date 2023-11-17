@@ -29,3 +29,7 @@ export async function conversation(
 export async function createThread(): Promise<Thread> {
   return await invoke("create_thread");
 }
+
+export async function logout(): Promise<void> {
+  await invoke("on_close");
+}

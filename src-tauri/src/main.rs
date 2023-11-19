@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex};
 
 #[tauri::command]
 async fn on_close(state: tauri::State<'_, BotState>) -> Result<(), String> {
+    println!("Closing");
     let db = {
         let state_guard = state.0.lock().unwrap();
         state_guard.db.clone()

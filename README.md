@@ -1,6 +1,6 @@
 # 🚀 ChatXpress
 
-**ChatXpress** offers a high-performance, user-friendly interface clone of ChatGPT. It is built with Rust, Astro, TailwindCSS, and HTMX. This allows for a fast, responsive, and stable experience comparable or superior to the original ChatGPT.
+**ChatXpress** offers a high-performance, user-friendly interface clone of ChatGPT. It is built with Tauri and SolidJS. This allows for a fast, responsive, and stable experience comparable or superior to the original ChatGPT.
 
 The app is currently in development and is not yet ready for use.
 

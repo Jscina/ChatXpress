@@ -20,7 +20,7 @@ const Header = ({ setSidebarOpen, isSidebarOpen }: HeaderProps) => {
           <i class="fa-solid fa-bars"></i>
         </button>
         <div class="transform transition-transform ease-in-out duration-300">
-          <h1 class="text-2xl font-semibold">Chat GPT</h1>
+          <h1 class="text-2xl font-semibold">ChatXPress</h1>
         </div>
       </header>
     </>

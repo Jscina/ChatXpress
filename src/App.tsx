@@ -17,7 +17,7 @@ const App = () => {
             ? "translate-x-w-54 bg-sidebar max-w-full"
             : "translate-x-0"
         }`}>
-        <div class="flex flex-col p-8 mt-16 h-screen justify-center items-center">
+        <div class="flex flex-col p-8 mt-16 bg-light dark:bg-dark h-screen justify-center items-center">
           <ChatWindow />
           <ChatInput isSidebarOpen={isSidebarOpen} />
         </div>

@@ -113,13 +113,13 @@ const UserProfile = () => {
               type="text"
               placeholder="Enter User Name..."
               value={userName()}
-              class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded p-1 mr-12"
+              class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded p-2 mr-10"
             />
           </div>
           <div class="flex flex-row items-center justify-between p-4">
             <p>Theme</p>
             <button
-              class="border-solid border-white border-2 rounded p-2 hover:bg-slate-400"
+              class="border-solid border-neutral-600 dark:border-white border-2 rounded p-2 hover:bg-slate-400"
               onClick={toggleDarkMode}>
               <i class={`fa-solid fa-${darkMode() ? "moon" : "sun"}`}></i>
             </button>

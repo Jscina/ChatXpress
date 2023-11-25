@@ -20,17 +20,16 @@ pub use database::database::Database;
 pub use database::models;
 pub use openai_tools::ChatBot;
 use std::sync::{Arc, Mutex};
-use tokio;
 
 pub struct State {
     pub bot: ChatBot,
     pub db: Database,
 }
 
-impl State {
-    pub fn new() -> State {
+impl Default for State {
+    fn default() -> State {
         State {
-            bot: ChatBot::new(),
+            bot: ChatBot::default(),
             db: {
                 let rt = tokio::runtime::Runtime::new().unwrap();
                 rt.block_on(Database::new())

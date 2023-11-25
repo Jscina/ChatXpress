@@ -9,3 +9,5 @@ const UserMessage = ({ message }: UserMessageProps) => {
     </div>
   );
 };
+
+export default UserMessage;

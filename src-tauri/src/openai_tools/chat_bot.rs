@@ -15,14 +15,15 @@ pub struct ChatBot {
     pub active_thread_id: Option<String>,
 }
 
-impl ChatBot {
-    pub fn new() -> ChatBot {
+impl Default for ChatBot {
+    fn default() -> ChatBot {
         ChatBot {
             client: Client::new(),
             active_thread_id: None,
         }
     }
-
+}
+impl ChatBot {
     pub async fn create_assistant(
         &self,
         name: &str,

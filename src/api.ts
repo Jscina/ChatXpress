@@ -16,7 +16,7 @@ export async function getHistory({ id }: Thread): Promise<ChatMessage[]> {
 export async function conversation(
   prompt: string,
   assistant: Assistant,
-  thread?: Thread
+  thread?: Thread,
 ): Promise<string> {
   const assistantId = assistant.id;
   return await invoke("conversation", {

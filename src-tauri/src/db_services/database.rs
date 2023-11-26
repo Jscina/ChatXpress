@@ -12,4 +12,9 @@ impl Database {
             pool: pool.unwrap(),
         }
     }
+
+    pub async fn init(&self) -> Result<(), sqlx::Error> {
+        sqlx::migrate!("./migrations").run(&self.pool).await?;
+        Ok(())
+    }
 }

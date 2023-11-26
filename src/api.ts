@@ -16,7 +16,7 @@ export async function getHistory({ id }: Thread): Promise<ChatMessage[]> {
 export async function conversation(
   prompt: string,
   assistant: Assistant,
-  thread?: Thread,
+  thread?: Thread
 ): Promise<string> {
   const assistantId = assistant.id;
   return await invoke("conversation", {
@@ -28,4 +28,12 @@ export async function conversation(
 
 export async function createThread(): Promise<Thread> {
   return await invoke("create_thread");
+}
+
+export async function getAssistants(): Promise<Assistant[]> {
+  return await invoke("get_assistants");
+}
+
+export async function getHistoryEntries(): Promise<string[]> {
+  return await invoke("read_all");
 }

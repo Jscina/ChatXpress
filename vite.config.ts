@@ -1,6 +1,13 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 
+declare const process: {
+  env: {
+    TAURI_DEBUG: boolean;
+    TAURI_PLATFORM: string;
+  };
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [solidPlugin()],
@@ -21,7 +28,7 @@ export default defineConfig({
   build: {
     target:
       process.env.TAURI_PLATFORM == "windows" ? "chrome105" : "safari13.1",
-    minify: !process.env.TAURI_DEBUG ? "esbuild" : false,
-    sourcemap: !!process.env.TAURI_DEBUG,
+    minify: process.env.TAURI_DEBUG ? false : "esbuild",
+    sourcemap: process.env.TAURI_DEBUG,
   },
 });

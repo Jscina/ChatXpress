@@ -1,4 +1,5 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
+import { initTE } from "tw-elements";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
@@ -6,6 +7,9 @@ import ChatWindow from "./components/ChatWindow";
 
 const App = () => {
   const [isSidebarOpen, setSidebarOpen] = createSignal<boolean>(false);
+  onMount(() => {
+    initTE();
+  });
 
   return (
     <>

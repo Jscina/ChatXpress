@@ -5,19 +5,20 @@ mod openai_tools {
 
 mod commands {
     pub mod assistant;
+    pub mod history_crud;
     pub mod schemas;
 }
 
-mod database {
+mod db_services {
     pub mod crud;
     pub mod database;
     pub mod models;
 }
 
 pub use commands::*;
-pub use database::crud;
-pub use database::database::Database;
-pub use database::models;
+pub use db_services::crud;
+pub use db_services::database::Database;
+pub use db_services::models;
 pub use openai_tools::ChatBot;
 use std::sync::{Arc, Mutex};
 

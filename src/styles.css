@@ -2,10 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-light text-primary-dark font-sans antialiased overflow-x-hidden;
-}
+@layer {
+  body {
+    @apply bg-light text-primary-dark font-sans antialiased overflow-x-hidden;
+  }
 
-.dark body {
-  @apply bg-dark text-primary-light;
+  .dark body {
+    @apply bg-dark text-primary-light;
+  }
 }

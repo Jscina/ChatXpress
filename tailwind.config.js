@@ -3,6 +3,11 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   darkMode: "class",
+  content: [
+    "./src/**/*.{html,ts,tsx}",
+    "./public/**/*.html",
+    "./node_modules/tw-elements/dist/js/**/*.js",
+  ],
   theme: {
     extend: {
       colors: {
@@ -25,5 +30,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [require("tw-elements/dist/plugin.cjs")],
 };

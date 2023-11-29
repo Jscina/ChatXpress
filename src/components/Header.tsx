@@ -4,6 +4,9 @@ interface HeaderProps {
 }
 
 const Header = ({ setSidebarOpen, isSidebarOpen }: HeaderProps) => {
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen());
+  };
   return (
     <>
       <header
@@ -14,9 +17,7 @@ const Header = ({ setSidebarOpen, isSidebarOpen }: HeaderProps) => {
           class={`relative focus:outline-none p-2 ${
             isSidebarOpen() ? "hidden" : "block"
           }`}
-          onClick={() => {
-            setSidebarOpen(!isSidebarOpen());
-          }}>
+          onClick={toggleSidebar}>
           <i class="fa-solid fa-bars"></i>
         </button>
         <div class="transform transition-transform ease-in-out duration-300">

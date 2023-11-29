@@ -5,17 +5,108 @@ interface MenuItemProps {
   onClick?: () => void;
 }
 
-const MenuItem = ({ name, onClick }: MenuItemProps) => {
+const MenuItem = ({ name, onClick }: MenuItemProps) => (
+  <li class="p-2">
+    <button
+      class="text-gray-300 border-none bg-transparent p-2 rounded hover:bg-gray-500"
+      onClick={onClick}>
+      {name}
+    </button>
+  </li>
+);
+
+interface UserMenuProps {
+  showMenu: () => boolean;
+  openSettings: () => void;
+}
+
+const UserMenu = (props: UserMenuProps) => {
   return (
-    <>
-      <li class="p-2">
+    <div
+      class={`bg-sidebar p-5 shadow-md absolute left-8 bottom-20 z-50 ${
+        !props.showMenu() ? "hidden" : "block"
+      }`}>
+      <ul class="flex flex-col rounded-md p-2">
+        <MenuItem name="Settings" onClick={props.openSettings} />
+        <hr />
+        <MenuItem name="Quit" />
+      </ul>
+    </div>
+  );
+};
+
+interface SettingsDialogProps {
+  setDialogRef: (ref: HTMLDialogElement) => void;
+  closeSettings: () => void;
+  userName: string;
+  setUserName: (name: string) => void;
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+  apiKey: string;
+  setApiKey: (key: string) => void;
+  ApiKeyReveal: boolean;
+  setApiKeyReveal: (reveal: boolean) => void;
+}
+
+const SettingsDialog = (props: SettingsDialogProps) => {
+  return (
+    <dialog
+      class="absolute left-0 top-1/4 dark:bg-sidebar shadow-lg dark:text-white p-4 w-1/2 h-1/2 min-w-min rounded"
+      ref={props.setDialogRef}>
+      <div class="flex flex-row justify-between">
+        <h1 class="text-2xl">Settings</h1>
         <button
-          class="text-gray-300 border-none bg-transparent p-2 rounded hover:bg-gray-500"
-          onClick={onClick}>
-          {name}
+          class="flex justify-center hover:bg-slate-400 dark:hover:bg-gray-500 p-3 mb-1 rounded items-center"
+          onClick={props.closeSettings}>
+          <i class="fa-solid fa-x"></i>
         </button>
-      </li>
-    </>
+      </div>
+      <hr />
+      <br />
+      <div class="flex flex-col gap-3 justify-center">
+        <div class="flex flex-row items-center justify-between p-4">
+          <p class="mr-4">User Name</p>
+          <input
+            onChange={(e) => {
+              props.setUserName(e.currentTarget.value);
+            }}
+            type="text"
+            placeholder="Enter User Name..."
+            value={props.userName}
+            class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded p-2 mr-10"
+          />
+        </div>
+        <div class="flex flex-row items-center justify-between p-4">
+          <p class="mr-4">Theme</p>
+          <button
+            class="border-solid border-neutral-600 dark:border-white border-2 rounded p-2 hover:bg-slate-400"
+            onClick={props.toggleDarkMode}>
+            <i class={`fa-solid fa-${props.darkMode ? "moon" : "sun"}`}></i>
+          </button>
+        </div>
+        <div class="flex flex-row justify-between items-center p-4">
+          <p class="mr-4">API Key</p>
+          <div class="flex justify-end gap-3">
+            <input
+              onChange={(e) => {
+                props.setApiKey(e.currentTarget.value);
+              }}
+              type={!props.ApiKeyReveal ? "password" : "text"}
+              placeholder="Enter API Key..."
+              value={props.apiKey}
+              class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded"
+            />
+            <button
+              class="hover:bg-slate-400 border-solid border-2 shadow p-2 rounded"
+              onClick={() => {
+                props.setApiKeyReveal(!props.ApiKeyReveal);
+              }}>
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
   );
 };
 
@@ -23,11 +114,10 @@ const UserProfile = () => {
   const [showMenu, setShowMenu] = createSignal(false);
   const [darkMode, setDarkMode] = createSignal(false);
   const [ApiKeyReveal, setApiKeyReveal] = createSignal(false);
-  const [menuRef, setMenuRef] = createSignal<HTMLDivElement>();
   const [displayName, setDisplayName] = createSignal("");
-  const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement>();
   const [userName, setUserName] = createSignal("");
   const [apiKey, setApiKey] = createSignal("");
+  const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement>();
 
   const openSettings = () => {
     dialogRef()?.showModal();
@@ -43,19 +133,9 @@ const UserProfile = () => {
     setDarkMode(!darkMode());
   };
 
-  createEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showMenu() && !menuRef()?.contains(event.target as Node)) {
-        setShowMenu(!showMenu());
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  });
+  const toggleMenu = () => {
+    setShowMenu(!showMenu());
+  };
 
   createEffect(() => {
     if (userName() !== "") {
@@ -64,89 +144,30 @@ const UserProfile = () => {
   });
 
   onMount(() => {
-    // Set the display name to this for now
-    setDisplayName("User");
+    setDisplayName("Settings");
   });
 
   return (
     <>
       <div
         class="flex flex-row justify-between items-center p-4 rounded hover:bg-gray-600 cursor-pointer"
-        onClick={() => {
-          setShowMenu(!showMenu());
-        }}>
+        onClick={toggleMenu}>
         <p>{displayName()}</p>
         <i class="fa-solid fa-ellipsis text-xs"></i>
       </div>
-
-      {showMenu() && (
-        <div
-          class="bg-sidebar p-5 shadow-md absolute left-8 bottom-20 z-50"
-          ref={setMenuRef}>
-          <ul class="flex flex-col rounded-md p-2">
-            <MenuItem name="Settings" onClick={openSettings} />
-            <hr />
-            <MenuItem name="Quit" />
-          </ul>
-        </div>
-      )}
-      <dialog
-        class="absolute left-0 top-1/4 dark:bg-sidebar shadow-lg dark:text-white p-4 w-1/2 h-1/2 rounded"
-        ref={setDialogRef}>
-        <div class="flex flex-row justify-between">
-          <h1 class="text-2xl">Settings</h1>
-          <button
-            class="flex justify-center hover:bg-slate-400 dark:hover:bg-gray-500 p-3 mb-1 rounded items-center"
-            onClick={closeSettings}>
-            <i class="fa-solid fa-x"></i>
-          </button>
-        </div>
-        <hr />
-        <br />
-        <div class="flex flex-col gap-3 justify-center">
-          <div class="flex flex-row items-center justify-between p-4">
-            <p>User Name</p>
-            <input
-              onChange={(e) => {
-                setUserName(e.currentTarget.value);
-              }}
-              type="text"
-              placeholder="Enter User Name..."
-              value={userName()}
-              class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded p-2 mr-10"
-            />
-          </div>
-          <div class="flex flex-row items-center justify-between p-4">
-            <p>Theme</p>
-            <button
-              class="border-solid border-neutral-600 dark:border-white border-2 rounded p-2 hover:bg-slate-400"
-              onClick={toggleDarkMode}>
-              <i class={`fa-solid fa-${darkMode() ? "moon" : "sun"}`}></i>
-            </button>
-          </div>
-          <div class="flex flex-row justify-between items-center p-4">
-            <p>API Key</p>
-            <div class="flex justify-end gap-3">
-              <input
-                onChange={(e) => {
-                  setApiKey(e.currentTarget.value);
-                }}
-                type={!ApiKeyReveal() ? "password" : "text"}
-                placeholder="Enter API Key..."
-                value={apiKey()}
-                class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded"
-              />
-              <button
-                class="hover:bg-slate-400 border-solid border-2 shadow p-2 rounded"
-                onClick={() => {
-                  setApiKeyReveal(!ApiKeyReveal());
-                }}>
-                <i class="fa-regular fa-eye"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </dialog>
+      <UserMenu showMenu={showMenu} openSettings={openSettings} />
+      <SettingsDialog
+        setDialogRef={setDialogRef}
+        closeSettings={closeSettings}
+        userName={userName()}
+        setUserName={setUserName}
+        darkMode={darkMode()}
+        toggleDarkMode={toggleDarkMode}
+        apiKey={apiKey()}
+        setApiKey={setApiKey}
+        ApiKeyReveal={ApiKeyReveal()}
+        setApiKeyReveal={setApiKeyReveal}
+      />
     </>
   );
 };

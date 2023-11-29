@@ -1,4 +1,13 @@
 import UserProfile from "./UserProfile";
+import { onMount, createSignal, For } from "solid-js";
+
+interface HistoryItemProps {
+  name: string;
+}
+
+const HistoryItem = ({ name }: HistoryItemProps) => {
+  return <div class="flex flex-row justify-between">{name}</div>;
+};
 
 interface SidebarProps {
   setSidebarOpen: (val: boolean) => void;
@@ -6,6 +15,15 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
+  const [history, setHistory] = createSignal<string[] | null>(null);
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen());
+  };
+
+  onMount(async () => {
+    setHistory(["Hello", "Hi", "How are you?"]);
+  });
+
   return (
     <>
       <nav
@@ -20,16 +38,20 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
             </button>
             <button
               class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-3 mb-3"
-              onClick={() => {
-                setSidebarOpen(!isSidebarOpen());
-              }}>
+              onClick={toggleSidebar}>
               <i class="fa-solid fa-x"></i>
             </button>
           </div>
           <hr />
         </div>
         <div class="flex flex-col space-y-2 p-4 overflow-y-auto flex-grow">
-          <div></div>
+          <For each={history()}>
+            {(message, _) => {
+              if (message) {
+                return <HistoryItem name={message} />;
+              }
+            }}
+          </For>
         </div>
         <div class="flex-none">
           <hr />

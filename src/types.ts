@@ -1,7 +1,7 @@
 export enum AIRole {
   SYSTEM = "system",
   USER = "user",
-  ASSISSTANT = "assistant",
+  ASSISTANT = "assistant",
   FUNCTION = "function",
 }
 

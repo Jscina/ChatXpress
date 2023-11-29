@@ -32,9 +32,9 @@ const ChatWindow = () => {
               <For each={history()}>
                 {(message) => {
                   switch (message.role) {
-                    case "user":
+                    case AIRole.USER:
                       return <UserMessage message={message.content} />;
-                    case "assistant":
+                    case AIRole.ASSISTANT:
                       return <AssistantMessage message={message.content} />;
                   }
                 }}

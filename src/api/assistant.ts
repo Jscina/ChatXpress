@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/tauri";
-import type { Assistant, Thread, ChatMessage } from "./types";
+import type { Assistant, Thread } from "../types";
 
 export async function deleteThread(thread: Thread): Promise<void> {
   await invoke("delete_thread", { thread: thread });
@@ -7,10 +7,6 @@ export async function deleteThread(thread: Thread): Promise<void> {
 
 export async function createAssistant(assistant: Assistant): Promise<string> {
   return await invoke("create_assistant", { assistant: assistant });
-}
-
-export async function getHistory({ id }: Thread): Promise<ChatMessage[]> {
-  return await invoke("get_history", { thread_id: id });
 }
 
 export async function conversation(
@@ -32,8 +28,4 @@ export async function createThread(): Promise<Thread> {
 
 export async function getAssistants(): Promise<Assistant[]> {
   return await invoke("get_assistants");
-}
-
-export async function getHistoryEntries(): Promise<string[]> {
-  return await invoke("read_all");
 }

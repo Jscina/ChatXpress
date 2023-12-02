@@ -4,8 +4,10 @@ interface UserMessageProps {
 
 const UserMessage = ({ message }: UserMessageProps) => {
   return (
-    <div class="flex justify-center items-center">
-      <p>{message}</p>
+    <div class="flex justify-center p-4">
+      <div class="flex p-2 max-w-[50%]">
+        <p class="flex">{message}</p>
+      </div>
     </div>
   );
 };

@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer {
+@layer base {
   body {
     @apply bg-light text-primary-dark font-sans antialiased overflow-x-hidden;
   }
 
-  .dark body {
+  body.dark {
     @apply bg-dark text-primary-light;
   }
 }

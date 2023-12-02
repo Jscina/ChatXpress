@@ -1,13 +1,7 @@
-import UserProfile from "./UserProfile";
 import { onMount, createSignal, For } from "solid-js";
-
-interface HistoryItemProps {
-  name: string;
-}
-
-const HistoryItem = ({ name }: HistoryItemProps) => {
-  return <div class="flex flex-row justify-between">{name}</div>;
-};
+import clsx from "clsx";
+import UserProfile from "./UserProfile";
+import HistoryItem from "./HistoryItem";
 
 interface SidebarProps {
   setSidebarOpen: (val: boolean) => void;
@@ -27,9 +21,13 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
   return (
     <>
       <nav
-        class={`fixed top-0 left-0 w-56 transition-transform ease-in-out transform duration-300 ${
-          isSidebarOpen() ? "translate-x-0" : "-translate-x-full"
-        } shadow-lg max-h-screen overflow-y-hidden bg-sidebar text-white flex flex-col h-full`}>
+        class={clsx(
+          "fixed top-0 left-0 w-56 transition-transform ease-in-out transform duration-300 shadow-lg max-h-screen overflow-y-hidden bg-sidebar text-white flex flex-col h-full",
+          {
+            "translate-x-0": isSidebarOpen(),
+            "-translate-x-full": !isSidebarOpen(),
+          }
+        )}>
         <div class="flex-none">
           <div class="flex flex-row mt-3 justify-center">
             <button class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-3 mb-3">
@@ -48,7 +46,7 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
           <For each={history()}>
             {(message, _) => {
               if (message) {
-                return <HistoryItem name={message} />;
+                return <HistoryItem initialName={message} />;
               }
             }}
           </For>

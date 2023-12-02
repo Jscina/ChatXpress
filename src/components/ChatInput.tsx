@@ -1,10 +1,6 @@
 import { createSignal, createEffect } from "solid-js";
 
-interface ChatInputProps {
-  isSidebarOpen: () => boolean;
-}
-
-const ChatInput = ({ isSidebarOpen }: ChatInputProps) => {
+const ChatInput = () => {
   const [messageRef, setMessageRef] = createSignal<HTMLTextAreaElement>();
   const [userMessage, setUserMessage] = createSignal<string>("");
 
@@ -24,16 +20,13 @@ const ChatInput = ({ isSidebarOpen }: ChatInputProps) => {
   });
 
   return (
-    <div
-      class={`flex flex-col items-center max-w-[50%] w-full py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out ${
-        isSidebarOpen() ? "mr-56" : "ml-0"
-      }`}>
+    <div class="flex flex-col items-center max-w-[50%] w-full py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out">
       <form class="m-0 w-full flex flex-col gap-2" onSubmit={sendMessage}>
         <div class="flex items-center space-x-2">
           <textarea
             ref={setMessageRef}
             rows="1"
-            class="resize-none border-0 p-2 overflow-y-auto max-h-full dark:bg-neutral-600 dark:text-white bg-transparent flex-grow"
+            class="resize-none border-0 p-2 overflow-y-auto max-h-full dark:bg-neutral-600 dark:text-white bg-transparent flex-grow outline-none"
             placeholder="Send a message..."
             required></textarea>
           <button

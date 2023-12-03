@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use sqlx::{sqlite::SqliteRow, FromRow, Row};
 
 pub enum Role {
     System,
@@ -10,10 +11,10 @@ pub enum Role {
 impl Role {
     pub fn default(&self) -> String {
         match &self {
-            Role::System => "system".to_string(),
-            Role::User => "user".to_string(),
-            Role::Assistant => "assistant".to_string(),
-            Role::Function => "function".to_string(),
+            Role::System => "system".into(),
+            Role::User => "user".into(),
+            Role::Assistant => "assistant".into(),
+            Role::Function => "function".into(),
         }
     }
 }
@@ -39,7 +40,8 @@ impl Thread {
 
 #[derive(Deserialize, Serialize)]
 pub struct Assistant {
-    id: String,
+    id: u32,
+    assistant_id: String,
     name: Option<String>,
     description: Option<String>,
     model: Option<String>,
@@ -57,12 +59,27 @@ impl Assistant {
         tools: Option<Vec<String>>,
     ) -> Self {
         Self {
-            id,
+            id: 0,
+            assistant_id: id,
             name,
             description,
             model,
             instructions,
             tools,
         }
+    }
+}
+
+impl<'r> FromRow<'r, SqliteRow> for Assistant {
+    fn from_row(row: &'r SqliteRow) -> Result<Self, sqlx::Error> {
+        Ok(Self {
+            id: row.get(0),
+            assistant_id: row.get(5),
+            name: row.get(1),
+            description: row.get(2),
+            model: row.get(3),
+            instructions: row.get(4),
+            tools: None,
+        })
     }
 }

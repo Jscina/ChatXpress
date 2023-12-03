@@ -76,7 +76,7 @@ pub async fn create_assistant(
             Some(instructions),
             Some(tools),
         )),
-        Err(_) => Err("Failed to create assistant".to_string()),
+        Err(_) => Err("Failed to create assistant".into()),
     }
 }
 
@@ -97,7 +97,7 @@ pub async fn get_history(
             });
             Ok(())
         }
-        Err(_) => Err("Failed to get history".to_string()),
+        Err(_) => Err("Failed to get history".into()),
     }
 }
 

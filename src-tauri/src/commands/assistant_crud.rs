@@ -1,14 +1,14 @@
-use crate::{db_services::crud, models::HistoryEntry, BotState};
+use crate::{db_services::crud, schemas::Assistant, BotState};
 
 #[tauri::command(async, rename_all = "snake_case")]
-pub async fn history_read_all(
+pub async fn assistant_read_all(
     state: tauri::State<'_, BotState>,
-) -> Result<Vec<HistoryEntry>, String> {
+) -> Result<Vec<Assistant>, String> {
     let db = {
         let state_guard = state.0.lock().unwrap();
         state_guard.db.clone()
     };
-    let res = crud::history_read_all(&db).await;
+    let res = crud::assistant_read_all(&db).await;
     match res {
         Ok(entries) => Ok(entries),
         Err(_) => Err("Failed to read all entries".into()),
@@ -16,16 +16,16 @@ pub async fn history_read_all(
 }
 
 #[tauri::command(async, rename_all = "snake_case")]
-pub async fn history_read_one(
+pub async fn assistant_read_one(
     id: u32,
-    thread_id: String,
+    assistant_id: String,
     state: tauri::State<'_, BotState>,
-) -> Result<HistoryEntry, String> {
+) -> Result<Assistant, String> {
     let db = {
         let state_guard = state.0.lock().unwrap();
         state_guard.db.clone()
     };
-    let res = crud::history_read_one(&db, id, &thread_id).await;
+    let res = crud::assistant_read_one(&db, id, &assistant_id).await;
     match res {
         Ok(entry) => Ok(entry),
         Err(_) => Err("Failed to read entry".into()),
@@ -33,17 +33,17 @@ pub async fn history_read_one(
 }
 
 #[tauri::command(async, rename_all = "snake_case")]
-pub async fn history_update(
+pub async fn assistant_update(
     id: u32,
-    thread_id: String,
-    thread_name: String,
+    assistant_id: String,
+    assistant_name: String,
     state: tauri::State<'_, BotState>,
 ) -> Result<(), String> {
     let db = {
         let state_guard = state.0.lock().unwrap();
         state_guard.db.clone()
     };
-    let res = crud::history_update(&db, id, &thread_id, &thread_name).await;
+    let res = crud::assistant_update(&db, id, &assistant_id, &assistant_name).await;
     match res {
         Ok(_) => Ok(()),
         Err(_) => Err("Failed to update entry".into()),
@@ -51,16 +51,16 @@ pub async fn history_update(
 }
 
 #[tauri::command(async, rename_all = "snake_case")]
-pub async fn history_delete(
+pub async fn assistant_delete(
     id: u32,
-    thread_id: String,
+    assistant_id: String,
     state: tauri::State<'_, BotState>,
 ) -> Result<(), String> {
     let db = {
         let state_guard = state.0.lock().unwrap();
         state_guard.db.clone()
     };
-    let res = crud::history_delete(&db, id, &thread_id).await;
+    let res = crud::assistant_delete(&db, id, &assistant_id).await;
     match res {
         Ok(_) => Ok(()),
         Err(_) => Err("Failed to delete entry".into()),
@@ -68,16 +68,16 @@ pub async fn history_delete(
 }
 
 #[tauri::command(async, rename_all = "snake_case")]
-pub async fn history_create(
-    thread_id: String,
-    thread_name: String,
+pub async fn assistant_create(
+    assistant_id: String,
+    assistant_name: String,
     state: tauri::State<'_, BotState>,
 ) -> Result<(), String> {
     let db = {
         let state_guard = state.0.lock().unwrap();
         state_guard.db.clone()
     };
-    let res = crud::history_create(&db, &thread_id, &thread_name).await;
+    let res = crud::assistant_create(&db, &assistant_id, &assistant_name).await;
     match res {
         Ok(_) => Ok(()),
         Err(_) => Err("Failed to create entry".into()),

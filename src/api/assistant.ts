@@ -6,14 +6,14 @@ export async function deleteThread(thread: Thread): Promise<void> {
 }
 
 export async function createAssistant(assistant: Assistant): Promise<string> {
-  return await invoke("create_assistant", { assistant: assistant });
+  return await invoke("create_assistant", { ...assistant });
 }
 
 export async function conversation(
   prompt: string,
   assistant: Assistant,
   thread?: Thread
-): Promise<string> {
+): Promise<[string, Thread]> {
   const assistantId = assistant.id;
   return await invoke("conversation", {
     prompt: prompt,
@@ -26,6 +26,6 @@ export async function createThread(): Promise<Thread> {
   return await invoke("create_thread");
 }
 
-export async function getAssistants(): Promise<Assistant[]> {
-  return await invoke("get_assistants");
+export async function getHistory(thread: Thread): Promise<string[]> {
+  return await invoke("get_history", { thread_id: thread.id });
 }

@@ -1,7 +1,9 @@
 import { onMount, createSignal, For } from "solid-js";
+import { readAllThreads } from "../api/history_crud";
 import clsx from "clsx";
 import UserProfile from "./UserProfile";
 import HistoryItem from "./HistoryItem";
+import type { Thread } from "../types";
 
 interface SidebarProps {
   setSidebarOpen: (val: boolean) => void;
@@ -15,7 +17,8 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
   };
 
   onMount(async () => {
-    setHistory(["Hello", "Hi", "How are you?"]);
+    const threads = await readAllThreads();
+    setHistory(threads);
   });
 
   return (

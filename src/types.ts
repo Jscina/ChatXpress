@@ -11,12 +11,13 @@ export type ChatMessage = {
 };
 
 export type Assistant = {
+  id?: number;
+  assistant_id?: string;
   name: string;
-  id: string;
   description: string;
   model: string;
   instructions: string;
-  tools: string[];
+  tools?: string[];
 };
 
 export type Thread = {

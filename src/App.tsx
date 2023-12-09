@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import "highlight.js/styles/github.css";
 import clsx from "clsx";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";

@@ -1,14 +1,27 @@
+import { onMount, createSignal } from 'solid-js';
+import { marked } from 'marked';
+import hljs from 'highlight.js/lib/core';
+import DOMPurify from 'dompurify';
+
 interface AssistantMessageProps {
   message: string;
 }
 
 const AssistantMessage = ({ message }: AssistantMessageProps) => {
+  const [markdownContent, setMarkdownContent] = createSignal<string>(message);
+
+  onMount(async () => {
+    const markedContent = await marked(message);
+    const sanitizedContent = DOMPurify.sanitize(markedContent);
+    setMarkdownContent(sanitizedContent);
+    hljs.highlightAll();
+  });
+
   return (
-    <>
-      <div class="flex justify-center p-4">
-        <div class="flex p-2 max-w-[50%]">{message}</div>
+    <div class="flex justify-center p-4">
+      <div class="flex p-2  max-w-[50%]" innerHTML={markdownContent()}>
       </div>
-    </>
+    </div>
   );
 };
 

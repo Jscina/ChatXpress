@@ -1,18 +1,32 @@
 import { createSignal, createEffect } from "solid-js";
 
 const ChatInput = () => {
-  const [messageRef, setMessageRef] = createSignal<HTMLTextAreaElement>();
   const [userMessage, setUserMessage] = createSignal<string>("");
+  const [messageRef, setMessageRef] = createSignal<HTMLDivElement>();
+  const [message, setMessage] = createSignal<string>("");
 
   const sendMessage = (e: Event) => {
     e.preventDefault();
-    const promptInput = messageRef();
+    const promptInput = message();
 
-    if (promptInput && promptInput.value !== "") {
-      setUserMessage(promptInput.value);
-      promptInput.value = "";
+    if (promptInput !== "") {
+      setUserMessage(promptInput);
+      setMessage("");
     }
   };
+
+  const handleInput = (e: any) => {
+    setMessage(e.currentTarget.value);
+
+    const scrollHeight = e.target.scrollHeight;
+    if (message()) {
+      messageRef()?.style.setProperty("height", scrollHeight + "px");
+    }
+    else {
+      messageRef()?.style.setProperty("height", "auto");
+    }
+  };
+
 
   createEffect(async () => {
     if (userMessage() !== "") {
@@ -20,13 +34,14 @@ const ChatInput = () => {
   });
 
   return (
-    <div class="flex flex-col items-center max-w-[50%] w-full py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out">
+    <div class="flex flex-col mb-4 items-center max-w-[50%] w-full min-w-min py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out">
       <form class="m-0 w-full flex flex-col gap-2" onSubmit={sendMessage}>
         <div class="flex items-center space-x-2">
           <textarea
             ref={setMessageRef}
+            onInput={handleInput}
             rows="1"
-            class="resize-none border-0 p-2 overflow-y-auto max-h-full dark:bg-neutral-600 dark:text-white bg-transparent flex-grow outline-none"
+            class="resize-none border-0 p-2 overflow-y-auto max-h-40 dark:bg-neutral-600 dark:text-white bg-transparent flex-grow outline-none"
             placeholder="Send a message..."
             required></textarea>
           <button

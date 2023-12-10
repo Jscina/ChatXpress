@@ -130,6 +130,6 @@ pub async fn conversation(
             response,
             thread_copy.unwrap_or(Thread::new(thread_obj.id, None, None)),
         )),
-        Err(_) => return Err("Failed to get assistant response".to_string()),
+        Err(_) => Err("Failed to get assistant response".to_string()),
     }
 }

@@ -19,7 +19,8 @@ const AssistantMessage = ({ message }: AssistantMessageProps) => {
 
   return (
     <div class="flex justify-center p-4">
-      <div class="flex p-2  max-w-[50%]" innerHTML={markdownContent()}>
+      <div class="flex p-2 max-w-[50%] w-full">
+        <div class="flex" innerHTML={markdownContent()} />
       </div>
     </div>
   );

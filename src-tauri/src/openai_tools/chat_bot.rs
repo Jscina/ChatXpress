@@ -109,19 +109,14 @@ impl ChatBot {
     }
 
     async fn poll_thread(&self, run: &mut RunObject, thread_id: &str) -> Result<bool, OpenAIError> {
-        loop {
-            match run.status {
-                RunStatus::Queued | RunStatus::InProgress => {
-                    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-                    *run = self
-                        .client
-                        .threads()
-                        .runs(thread_id)
-                        .retrieve(&run.id)
-                        .await?;
-                }
-                _ => break,
-            }
+        while let RunStatus::Queued | RunStatus::InProgress = run.status {
+            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+            *run = self
+                .client
+                .threads()
+                .runs(thread_id)
+                .retrieve(&run.id)
+                .await?;
         }
         Ok(true)
     }

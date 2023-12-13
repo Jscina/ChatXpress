@@ -11,7 +11,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
-  const [history, setHistory] = createSignal<string[] | null>(null);
+  const [history, setHistory] = createSignal<Thread[] | null>(null);
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen());
   };
@@ -29,8 +29,9 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
           {
             "translate-x-0": isSidebarOpen(),
             "-translate-x-full": !isSidebarOpen(),
-          }
-        )}>
+          },
+        )}
+      >
         <div class="flex-none">
           <div class="flex flex-row mt-3 justify-center">
             <button class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-3 mb-3">
@@ -39,7 +40,8 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
             </button>
             <button
               class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-3 mb-3"
-              onClick={toggleSidebar}>
+              onClick={toggleSidebar}
+            >
               <i class="fa-solid fa-x"></i>
             </button>
           </div>
@@ -49,7 +51,7 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
           <For each={history()}>
             {(message, _) => {
               if (message) {
-                return <HistoryItem initialName={message} />;
+                return <HistoryItem initialName={message.name} />;
               }
             }}
           </For>

@@ -8,6 +8,7 @@ import ChatWindow from "./components/ChatWindow";
 
 const App = () => {
   const [isSidebarOpen, setSidebarOpen] = createSignal<boolean>(false);
+  const [message, setMessage] = createSignal<string>("");
 
   return (
     <>
@@ -20,11 +21,12 @@ const App = () => {
             "translate-x-w-54 bg-sidebar max-w-[calc(100%-14rem)]":
               isSidebarOpen(),
             "translate-x-0 max-w-full": !isSidebarOpen(),
-          }
-        )}>
+          },
+        )}
+      >
         <div class="flex flex-col p-8 mt-16 bg-light dark:bg-dark h-screen justify-center items-center">
-          <ChatWindow />
-          <ChatInput />
+          <ChatWindow message={message} setMessage={setMessage} />
+          <ChatInput message={message} setMessage={setMessage} />
         </div>
       </main>
     </>

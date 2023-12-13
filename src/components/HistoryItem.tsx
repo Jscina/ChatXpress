@@ -17,13 +17,15 @@ const EditableItem = ({ name, setName, toggleEditable }: EditableItemProps) => (
     <button
       type="button"
       class="ml-auto hover:text-green-500"
-      onClick={toggleEditable}>
+      onClick={toggleEditable}
+    >
       <i class="fa-solid fa-check"></i>
     </button>
     <button
       type="button"
       class="ml-2 hover:text-red-500"
-      onClick={toggleEditable}>
+      onClick={toggleEditable}
+    >
       <i class="fa-solid fa-x"></i>
     </button>
   </div>
@@ -40,7 +42,8 @@ const NonEditableItem = ({ name, toggleEditable }: NonEditableItemProps) => (
     <button
       type="button"
       class="ml-auto hover:text-neutral-500"
-      onClick={toggleEditable}>
+      onClick={toggleEditable}
+    >
       <i class="fa-solid fa-pen-to-square"></i>
     </button>
     <button type="button" class="ml-2 hover:text-red-500">
@@ -50,7 +53,7 @@ const NonEditableItem = ({ name, toggleEditable }: NonEditableItemProps) => (
 );
 
 interface HistoryItemProps {
-  initialName: string;
+  initialName?: string;
 }
 
 const HistoryItem = ({ initialName }: HistoryItemProps) => {
@@ -65,12 +68,16 @@ const HistoryItem = ({ initialName }: HistoryItemProps) => {
         when={!editable()}
         fallback={
           <EditableItem
-            name={name()}
+            name={name() ?? "New Chat"}
             setName={setName}
             toggleEditable={toggleEditable}
           />
-        }>
-        <NonEditableItem name={name()} toggleEditable={toggleEditable} />
+        }
+      >
+        <NonEditableItem
+          name={name() ?? "New Chat"}
+          toggleEditable={toggleEditable}
+        />
       </Show>
     </div>
   );

@@ -1,27 +1,30 @@
-import { createSignal, onMount, For } from "solid-js";
+import { createSignal, onMount, createEffect, Index } from "solid-js";
 import AssistantMessage from "./AssistantMessage";
 import UserMessage from "./UserMessage";
 import { AIRole, type ChatMessage } from "../types";
 
-const ChatWindow = () => {
+interface ChatWindowProps {
+  message: () => string;
+  setMessage: (message: string) => void;
+}
+
+const ChatWindow = ({ message, setMessage }: ChatWindowProps) => {
   const [history, setHistory] = createSignal<ChatMessage[] | null>(null);
 
-  onMount(async () => {
-    setHistory([
-      {
+  createEffect(() => {
+    const userMessage = message();
+    if (userMessage) {
+      const newHistory = history() || [];
+      newHistory.push({
         role: AIRole.USER,
-        content: "Hello"
+        content: userMessage,
+      });
+      setHistory(newHistory);
+    }
+  });
 
-      },
-      {
-        role: AIRole.ASSISTANT,
-        content: "Hi, I am doing well. How are you? I am here to listen :)",
-      },
-      {
-        role: AIRole.USER,
-        content: "Thanks, what is the meaning of life?"
-      },
-    ]);
+  onMount(() => {
+    setHistory(null);
   });
 
   return (
@@ -30,16 +33,21 @@ const ChatWindow = () => {
         <div class="flex">
           <div class="space-y-4 overflow-y-scroll overflow-x-hidden flex-grow shadowflex flex-col shadow-lg rounded-lg transition-all duration-300 ease-in-out max-h-45">
             <div class="flex flex-col justify-center self-center border-none rounded-lg">
-              <For each={history()}>
-                {(message) => {
-                  switch (message.role) {
+              <Index each={history()}>
+                {(entry) => {
+                  switch (entry().role) {
                     case AIRole.USER:
-                      return <UserMessage message={message.content} />;
+                      return (
+                        <UserMessage
+                          message={entry().content}
+                          setMessage={setMessage}
+                        />
+                      );
                     case AIRole.ASSISTANT:
-                      return <AssistantMessage message={message.content} />;
+                      return <AssistantMessage message={entry().content} />;
                   }
                 }}
-              </For>
+              </Index>
             </div>
           </div>
         </div>

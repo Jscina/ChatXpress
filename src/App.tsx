@@ -26,7 +26,7 @@ const App = () => {
       >
         <div class="flex flex-col p-8 mt-16 bg-light dark:bg-dark h-screen justify-center items-center">
           <ChatWindow message={message} setMessage={setMessage} />
-          <ChatInput message={message} setMessage={setMessage} />
+          <ChatInput setMessage={setMessage} />
         </div>
       </main>
     </>

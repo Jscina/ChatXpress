@@ -1,7 +1,7 @@
-import { onMount, createSignal } from 'solid-js';
-import { marked } from 'marked';
-import hljs from 'highlight.js/lib/core';
-import DOMPurify from 'dompurify';
+import { onMount, createSignal } from "solid-js";
+import { marked } from "marked";
+import hljs from "highlight.js/lib/core";
+import DOMPurify from "dompurify";
 
 interface AssistantMessageProps {
   message: string;
@@ -16,6 +16,10 @@ const AssistantMessage = ({ message }: AssistantMessageProps) => {
     setMarkdownContent(sanitizedContent);
     hljs.highlightAll();
   });
+
+  if (message === "") {
+    return null;
+  }
 
   return (
     <div class="flex justify-center p-4">

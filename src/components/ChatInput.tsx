@@ -1,27 +1,28 @@
 import { createSignal, createEffect } from "solid-js";
 
 interface ChatInputProps {
-  message: () => string;
   setMessage: (message: string) => void;
 }
 
-const ChatInput = ({ message, setMessage }: ChatInputProps) => {
-  const [messageRef, setMessageRef] = createSignal<HTMLDivElement>();
+const ChatInput = ({ setMessage }: ChatInputProps) => {
+  const [messageRef, setMessageRef] = createSignal<HTMLTextAreaElement>();
+  const [messageInput, setMessageInput] = createSignal("");
 
   const sendMessage = (e: Event) => {
     e.preventDefault();
-    const promptInput = message();
 
-    if (promptInput !== "") {
-      setMessage(promptInput);
-    }
+    const promptInput = messageInput();
+    const textArea = messageRef();
+
+    if (textArea) textArea.value = "";
+    if (promptInput !== "") setMessage(promptInput);
   };
 
   const handleInput = (e: any) => {
-    setMessage(e.currentTarget.value);
+    setMessageInput(e.currentTarget.value);
 
     const scrollHeight = e.target.scrollHeight;
-    if (message()) {
+    if (messageInput()) {
       messageRef()?.style.setProperty("height", scrollHeight + "px");
     } else {
       messageRef()?.style.setProperty("height", "auto");

@@ -6,4 +6,4 @@ SET
     instructions = ?,
 WHERE
     id = ?
-    AND assistant_id = ?
+    AND assistant_id = ?;

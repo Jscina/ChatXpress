@@ -12,14 +12,20 @@ const ChatWindow = ({ message, setMessage }: ChatWindowProps) => {
   const [history, setHistory] = createSignal<ChatMessage[] | null>(null);
 
   createEffect(() => {
-    const userMessage = message();
-    if (userMessage) {
-      const newHistory = history() || [];
-      newHistory.push({
-        role: AIRole.USER,
-        content: userMessage,
-      });
-      setHistory(newHistory);
+    const currentHistory = history() ?? [];
+    const newMessage = message();
+    const lastMessage = currentHistory[currentHistory.length - 1];
+    if (
+      message() !== "" &&
+      (!lastMessage || newMessage !== lastMessage.content)
+    ) {
+      setHistory([
+        ...currentHistory,
+        {
+          role: AIRole.USER,
+          content: message(),
+        },
+      ]);
     }
   });
 

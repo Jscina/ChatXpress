@@ -8,7 +8,7 @@ interface ChatWindowProps {
   setMessage: (message: string) => void;
 }
 
-const ChatWindow = ({ message, setMessage }: ChatWindowProps) => {
+const ChatWindow = ({ message }: ChatWindowProps) => {
   const [history, setHistory] = createSignal<ChatMessage[] | null>(null);
 
   createEffect(() => {
@@ -43,12 +43,7 @@ const ChatWindow = ({ message, setMessage }: ChatWindowProps) => {
                 {(entry) => {
                   switch (entry().role) {
                     case AIRole.USER:
-                      return (
-                        <UserMessage
-                          message={entry().content}
-                          setMessage={setMessage}
-                        />
-                      );
+                      return <UserMessage message={entry().content} />;
                     case AIRole.ASSISTANT:
                       return <AssistantMessage message={entry().content} />;
                   }

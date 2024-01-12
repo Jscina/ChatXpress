@@ -26,6 +26,7 @@
     "@tauri-apps/cli": "^1.5.6",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
+    "sass": "^1.69.6",
     "typescript": "^5.0.2",
     "vite": "^4.4.4",
     "vite-plugin-solid": "^2.7.0"

@@ -1,18 +1,8 @@
-import { onMount } from "solid-js";
-
 interface UserMessageProps {
   message: string;
-  setMessage: (message: string) => void;
 }
 
-const UserMessage = ({ message, setMessage }: UserMessageProps) => {
-  // onMount(() => {
-  //   if (false) {
-  //     // This will be used to allowing edit states for the user message
-  //     setMessage("");
-  //   }
-  // });
-
+const UserMessage = ({ message }: UserMessageProps) => {
   if (message === "") {
     return null;
   }

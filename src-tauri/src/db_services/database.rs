@@ -1,4 +1,5 @@
 use sqlx::SqlitePool;
+use tokio::fs;
 
 #[derive(Clone)]
 pub struct Database {
@@ -9,7 +10,13 @@ impl Database {
     pub async fn new() -> Database {
         let pool = SqlitePool::connect("sqlite:chatxpress.db").await;
         Database {
-            pool: pool.unwrap(),
+            pool: match pool {
+                Ok(pool) => pool,
+                Err(_) => {
+                    fs::write("chatxpress.db", "").await.unwrap();
+                    SqlitePool::connect("sqlite:chatxpress.db").await.unwrap()
+                }
+            },
         }
     }
 

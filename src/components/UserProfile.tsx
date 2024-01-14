@@ -1,4 +1,5 @@
 import { createSignal, onMount, createEffect, Show } from "solid-js";
+import SettingsMenu from "./SettingsMenu";
 import clsx from "clsx";
 
 interface MenuItemProps {
@@ -19,15 +20,14 @@ const MenuItem = ({ name, onClick, children }: MenuItemProps) => (
 const UserProfile = () => {
   const [showMenu, setShowMenu] = createSignal(false);
   const [darkMode, setDarkMode] = createSignal(false);
-  const [ApiKeyReveal, setApiKeyReveal] = createSignal(false);
   const [displayName, setDisplayName] = createSignal("");
   const [apiKey, setApiKey] = createSignal("");
   const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement>();
   const [menuRef, setMenuRef] = createSignal<HTMLDivElement>();
 
   const openSettings = () => {
-    dialogRef()?.showModal();
     setShowMenu(false);
+    dialogRef()?.showModal();
   };
 
   const closeSettings = () => {
@@ -77,6 +77,7 @@ const UserProfile = () => {
           class="bg-sidebar p-5 shadow-lg absolute left-8 bottom-20 z-50"
         >
           <ul class="flex flex-col rounded-md p-2">
+            <br />
             <MenuItem name="Settings" onClick={openSettings} />
             <br />
             <MenuItem name="Theme" onClick={toggleDarkMode}>
@@ -91,46 +92,13 @@ const UserProfile = () => {
           </ul>
         </div>
       </Show>
-      <dialog
-        class="absolute left-0 top-1/4 dark:bg-sidebar shadow-lg dark:text-white p-4 w-1/2 h-1/2 min-w-min rounded"
-        ref={setDialogRef}
-      >
-        <div class="flex flex-row justify-between">
-          <h1 class="text-2xl">Settings</h1>
-          <button
-            class="flex justify-center hover:bg-slate-400 dark:hover:bg-gray-500 p-3 mb-1 rounded items-center"
-            onClick={closeSettings}
-          >
-            <i class="fa-solid fa-x"></i>
-          </button>
-        </div>
-        <hr />
-        <br />
-        <div class="flex flex-col gap-3 justify-center">
-          <div class="flex flex-row justify-between items-center p-4">
-            <p class="mr-4">API Key</p>
-            <div class="flex justify-end gap-3">
-              <input
-                onChange={(e) => {
-                  setApiKey(e.currentTarget.value);
-                }}
-                type={!ApiKeyReveal() ? "password" : "text"}
-                placeholder="Enter API Key..."
-                value={apiKey()}
-                class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded"
-              />
-              <button
-                class="hover:bg-slate-400 border-solid border-2 shadow p-2 rounded"
-                onClick={() => {
-                  setApiKeyReveal(!ApiKeyReveal());
-                }}
-              >
-                <i class="fa-regular fa-eye"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </dialog>
+      <SettingsMenu
+        apiKey={apiKey}
+        setApiKey={setApiKey}
+        dialogRef={dialogRef}
+        setDialogRef={setDialogRef}
+        closeSettings={closeSettings}
+      />
     </>
   );
 };

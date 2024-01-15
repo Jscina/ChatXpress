@@ -1,14 +1,21 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import "highlight.js/styles/github.css";
 import clsx from "clsx";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
+import { listAssistants } from "./api/assistant";
 
 const App = () => {
   const [isSidebarOpen, setSidebarOpen] = createSignal<boolean>(false);
   const [message, setMessage] = createSignal<string>("");
+
+  onMount(async () => {
+    const assistants = await listAssistants();
+
+    console.log(assistants[0]);
+  });
 
   return (
     <>

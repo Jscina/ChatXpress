@@ -2,9 +2,8 @@ use async_openai::{
     config::OpenAIConfig,
     error::OpenAIError,
     types::{
-        AssistantObject, AssistantTools, CreateAssistantRequestArgs, CreateMessageRequestArgs,
-        CreateRunRequestArgs, CreateThreadRequestArgs, ListMessagesResponse, MessageContent,
-        RunObject, RunStatus, ThreadObject,
+        AssistantObject, CreateMessageRequestArgs, CreateRunRequestArgs, CreateThreadRequestArgs,
+        ListMessagesResponse, MessageContent, RunObject, RunStatus, ThreadObject,
     },
     Client,
 };
@@ -24,24 +23,10 @@ impl Default for ChatBot {
     }
 }
 impl ChatBot {
-    pub async fn create_assistant(
-        &self,
-        name: &str,
-        description: &str,
-        model: &str,
-        instructions: &str,
-        tools: Vec<AssistantTools>,
-    ) -> Result<AssistantObject, OpenAIError> {
-        let assistant_request = CreateAssistantRequestArgs::default()
-            .name(name)
-            .description(description)
-            .model(model)
-            .instructions(instructions)
-            .tools(tools)
-            .build()?;
-
-        let assistant = self.client.assistants().create(assistant_request).await?;
-        Ok(assistant)
+    pub async fn list_assistants(&self) -> Result<Vec<AssistantObject>, OpenAIError> {
+        let query = [("limt", "10")];
+        let assistants = self.client.assistants().list(&query).await?;
+        Ok(assistants.data)
     }
 
     pub async fn retrieve_assistant(

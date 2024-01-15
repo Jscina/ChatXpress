@@ -2,10 +2,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 extern crate chatxpress;
 use chatxpress::{assistant::*, assistant_crud::*, history_crud::*, BotState, Database, State};
+use dotenv::dotenv;
 use std::sync::{Arc, Mutex};
 use tokio::runtime::Runtime;
 
 fn main() {
+    dotenv().ok();
     tauri::Builder::default()
         .setup(|_app| {
             let rt = Runtime::new().unwrap();
@@ -20,7 +22,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             conversation,
             get_history,
-            create_assistant,
+            list_assistants,
             create_thread,
             delete_thread,
             history_read_one,

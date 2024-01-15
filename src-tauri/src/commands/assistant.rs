@@ -1,5 +1,3 @@
-use async_openai::types::{AssistantTools, AssistantToolsCode, AssistantToolsRetrieval};
-
 use crate::{
     schemas::{Assistant, Thread},
     BotState,
@@ -32,51 +30,6 @@ pub async fn create_thread(state: tauri::State<'_, BotState>) -> Result<Thread, 
     match thread {
         Ok(thread) => Ok(Thread::new(thread.id, None, None)),
         Err(_) => Err("Failed to create thread".to_string()),
-    }
-}
-
-#[tauri::command(async, rename_all = "snake_case")]
-pub async fn create_assistant(
-    name: String,
-    description: String,
-    model: String,
-    instructions: String,
-    tools: Vec<String>,
-    state: tauri::State<'_, BotState>,
-) -> Result<Assistant, String> {
-    let bot = {
-        let state_guard = state.0.lock().unwrap();
-        state_guard.bot.clone()
-    };
-    let assistant = bot
-        .create_assistant(
-            &name,
-            &description,
-            &model,
-            &instructions,
-            tools
-                .iter()
-                .map(|tool| match tool.as_str() {
-                    "code" => AssistantTools::Code(AssistantToolsCode::default()),
-                    "function" => panic!(
-                        "Function tool not implemented, you can add them in the api playground."
-                    ),
-                    "search" => AssistantTools::Retrieval(AssistantToolsRetrieval::default()),
-                    _ => panic!("Invalid tool"),
-                })
-                .collect(),
-        )
-        .await;
-    match assistant {
-        Ok(assistant) => Ok(Assistant::new(
-            assistant.id,
-            Some(name),
-            Some(description),
-            Some(model),
-            Some(instructions),
-            Some(tools),
-        )),
-        Err(_) => Err("Failed to create assistant".into()),
     }
 }
 
@@ -132,4 +85,29 @@ pub async fn conversation(
         )),
         Err(_) => Err("Failed to get assistant response".to_string()),
     }
+}
+
+#[tauri::command(async, rename_all = "snake_case")]
+pub async fn list_assistants(state: tauri::State<'_, BotState>) -> Result<Vec<Assistant>, String> {
+    let bot = {
+        let state_guard = state.0.lock().unwrap();
+        state_guard.bot.clone()
+    };
+    let res = bot
+        .list_assistants()
+        .await
+        .unwrap()
+        .iter()
+        .map(|x| {
+            Assistant::new(
+                x.id.clone(),
+                x.name.clone(),
+                x.description.clone(),
+                Some(x.model.clone()),
+                x.instructions.clone(),
+                None,
+            )
+        })
+        .collect::<Vec<Assistant>>();
+    Ok(res)
 }

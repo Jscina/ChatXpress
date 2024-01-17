@@ -9,6 +9,8 @@ import {
   SelectValue,
 } from "./ui/select";
 
+import { Button } from "./ui/button";
+
 interface HeaderProps {
   setSidebarOpen: (val: boolean) => void;
   isSidebarOpen: () => boolean;
@@ -37,15 +39,18 @@ const Header = ({ setSidebarOpen, isSidebarOpen }: HeaderProps) => {
           },
         )}
       >
-        <button
-          class={clsx("relative focus:outline-none p-2", {
-            hidden: isSidebarOpen(),
-            block: !isSidebarOpen(),
-          })}
+        <Button
+          class={clsx(
+            "relative bg-transparent hover:bg-transparent focus:outline-none p-2",
+            {
+              hidden: isSidebarOpen(),
+              block: !isSidebarOpen(),
+            },
+          )}
           onClick={toggleSidebar}
         >
           <i class="fa-solid fa-bars"></i>
-        </button>
+        </Button>
         <div class="transform transition-transform ease-in-out duration-300">
           <Select
             value={selectedAssistant()}
@@ -56,13 +61,16 @@ const Header = ({ setSidebarOpen, isSidebarOpen }: HeaderProps) => {
               <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>
             )}
           >
-            <SelectTrigger aria-label="Fruit" class="w-[180px]">
+            <SelectTrigger
+              aria-label="Assistant"
+              class="w-[180px] border-none focus:outline-none focus:border-none"
+            >
               <SelectValue<string>>
                 {(state) => state.selectedOption()}
               </SelectValue>
             </SelectTrigger>
-            <SelectContent />
-          </Select>{" "}
+            <SelectContent class="dark:bg-dark dark:text-white border-none shadow-md" />
+          </Select>
         </div>
       </header>
     </>

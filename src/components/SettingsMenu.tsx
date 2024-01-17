@@ -1,4 +1,6 @@
 import { createSignal } from "solid-js";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 interface MenuItemProps {
   name: string;
@@ -31,18 +33,18 @@ const SettingsMenu = (props: SettingsMenuProps) => {
     >
       <div class="flex flex-row justify-between">
         <h1 class="text-2xl">Settings</h1>
-        <button
-          class="flex justify-center hover:bg-slate-400 dark:hover:bg-gray-500 p-3 mb-1 rounded items-center"
+        <Button
+          class="flex justify-center bg-transparent hover:bg-slate-400 dark:hover:bg-gray-500 p-3 mb-1 rounded items-center"
           onClick={props.closeSettings}
         >
           <i class="fa-solid fa-x"></i>
-        </button>
+        </Button>
       </div>
       <hr />
       <br />
       <div class="flex flex-col gap-3 justify-center">
         <SettingsItem name="Api Key">
-          <input
+          <Input
             onChange={(e) => {
               props.setApiKey(e.currentTarget.value);
             }}
@@ -51,30 +53,30 @@ const SettingsMenu = (props: SettingsMenuProps) => {
             value={props.apiKey()}
             class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded"
           />
-          <button
-            class="hover:bg-slate-400 border-solid border-2 shadow p-2 rounded"
+          <Button
+            class="hover:bg-slate-400 bg-transparent border-solid border-2 shadow p-3 rounded"
             onClick={() => {
               setApiKeyReveal(!apiKeyReveal());
             }}
           >
             <i class="fa-regular fa-eye"></i>
-          </button>
+          </Button>
         </SettingsItem>
 
         <SettingsItem name="Register Assistant">
-          <input
+          <Input
             onChange={(_) => {}}
             type="text"
             placeholder="Enter Assistant ID..."
             value={props.apiKey()}
             class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded"
           />
-          <button
-            class="hover:bg-slate-400 border-solid border-2 shadow p-2 rounded"
+          <Button
+            class="hover:bg-slate-400 bg-transparent border-solid border-2 shadow p-3 rounded"
             onClick={() => {}}
           >
             <i class="fa-regular fa-plus"></i>
-          </button>
+          </Button>
         </SettingsItem>
       </div>
     </dialog>

@@ -1,6 +1,7 @@
 import { createSignal, onMount, createEffect, Show } from "solid-js";
 import SettingsMenu from "./SettingsMenu";
 import clsx from "clsx";
+import { Button } from "./ui/button";
 
 interface MenuItemProps {
   name: string;
@@ -10,10 +11,13 @@ interface MenuItemProps {
 
 const MenuItem = ({ name, onClick, children }: MenuItemProps) => (
   <li class="p-2 w-full rounded text-gray-300 border-none bg-transparent hover:bg-gray-500">
-    <button class="flex flex-row items-center gap-3 p-2" onClick={onClick}>
+    <Button
+      class="flex flex-row bg-transparent hover:bg-transparent items-center gap-3 p-2"
+      onClick={onClick}
+    >
       <p>{name}</p>
       {children}
-    </button>
+    </Button>
   </li>
 );
 

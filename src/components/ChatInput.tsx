@@ -1,5 +1,8 @@
 import { createSignal, createEffect } from "solid-js";
 
+import { Button } from "./ui/button";
+import { Textarea } from "./ui/textarea";
+
 interface ChatInputProps {
   setMessage: (message: string) => void;
 }
@@ -35,20 +38,21 @@ const ChatInput = ({ setMessage }: ChatInputProps) => {
     <div class="flex flex-col mb-4 items-center max-w-[50%] w-full min-w-min py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out">
       <form class="m-0 w-full flex flex-col gap-2" onSubmit={sendMessage}>
         <div class="flex items-center space-x-2">
-          <textarea
+          <Textarea
             ref={setMessageRef}
             onInput={handleInput}
             rows="1"
-            class="resize-none border-0 p-2 overflow-y-auto max-h-40 dark:bg-neutral-600 dark:text-white bg-transparent flex-grow outline-none"
+            class="resize-none border-0 p-2 overflow-y-auto min-h-4 max-h-40 dark:bg-neutral-600 dark:text-white bg-transparent flex-grow outline-none"
+            style="outline: none !important; box-shadow: none !important;"
             placeholder="Send a message..."
             required
-          ></textarea>
-          <button
+          ></Textarea>
+          <Button
             type="submit"
-            class="w-10 h-10 p-2 rounded-md bg-green-500 text-white flex items-center justify-center"
+            class="w-10 h-10 p-2 rounded-md bg-green-500 hover:bg-green-400 text-white flex items-center justify-center"
           >
             <i class="fa-solid fa-paper-plane"></i>
-          </button>
+          </Button>
         </div>
       </form>
     </div>

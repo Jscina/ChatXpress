@@ -1,4 +1,6 @@
-import { createSignal, Show } from "solid-js";
+import { createSignal, createEffect, Show } from "solid-js";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 interface EditableItemProps {
   name: string;
@@ -6,51 +8,80 @@ interface EditableItemProps {
   toggleEditable: () => void;
 }
 
-const EditableItem = ({ name, setName, toggleEditable }: EditableItemProps) => (
-  <div class="flex items-center max-w-full">
-    <input
-      type="text"
-      class="bg-transparent border-b border-white text-white w-full outline-none"
-      value={name}
-      onInput={(e) => setName(e.target.value)}
-    />
-    <button
-      type="button"
-      class="ml-auto hover:text-green-500"
-      onClick={toggleEditable}
-    >
-      <i class="fa-solid fa-check"></i>
-    </button>
-    <button
-      type="button"
-      class="ml-2 hover:text-red-500"
-      onClick={toggleEditable}
-    >
-      <i class="fa-solid fa-x"></i>
-    </button>
-  </div>
-);
+const EditableItem = ({ name, setName, toggleEditable }: EditableItemProps) => {
+  const [newName, setNewName] = createSignal(name);
+
+  const updateName = () => {
+    if (newName() !== name || newName() !== "") {
+      setName(newName());
+    }
+    toggleEditable();
+  };
+
+  return (
+    <>
+      <div class="flex items-center max-w-full justify-between">
+        <Input
+          type="text"
+          class="bg-transparent border-none"
+          style="outline: none !important; box-shadow: none !important;"
+          value={name}
+          onInput={(e) => setNewName(e.target.value)}
+        />
+        <div class="flex gap-1">
+          <Button
+            class="flex p-2 bg-transparent hover:bg-transparent hover:text-green-500"
+            onClick={updateName}
+          >
+            <i class="fa-solid fa-check"></i>
+          </Button>
+          <Button
+            class="flex p-2 bg-transparent hover:bg-transparent hover:text-red-500"
+            onClick={toggleEditable}
+          >
+            <i class="fa-solid fa-x"></i>
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+};
 
 interface NonEditableItemProps {
   name: string;
   toggleEditable: () => void;
+  setDisabled: (val: boolean) => void;
 }
 
-const NonEditableItem = ({ name, toggleEditable }: NonEditableItemProps) => (
-  <>
-    <button type="button">{name}</button>
-    <button
-      type="button"
-      class="ml-auto hover:text-neutral-500"
-      onClick={toggleEditable}
-    >
-      <i class="fa-solid fa-pen-to-square"></i>
-    </button>
-    <button type="button" class="ml-2 hover:text-red-500">
-      <i class="fa-solid fa-trash"></i>
-    </button>
-  </>
-);
+const NonEditableItem = ({
+  name,
+  toggleEditable,
+  setDisabled,
+}: NonEditableItemProps) => {
+  return (
+    <>
+      <div class="flex justify-between w-full">
+        <Button class="bg-transparent hover:bg-transparent">{name}</Button>
+        <div class="flex gap-1">
+          <Button
+            class="flex p-2 hover:text-neutral-500 bg-transparent hover:bg-transparent"
+            onClick={toggleEditable}
+          >
+            <i class="fa-solid fa-pen-to-square"></i>
+          </Button>
+          <Button
+            onClick={() => {
+              setDisabled(true);
+            }}
+            class="flex p-2 hover:text-red-500 bg-transparent hover:bg-transparent"
+          >
+            <i class="fa-solid fa-trash"></i>
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+};
 
 interface HistoryItemProps {
   initialName?: string;
@@ -59,27 +90,39 @@ interface HistoryItemProps {
 const HistoryItem = ({ initialName }: HistoryItemProps) => {
   const [editable, setEditable] = createSignal(false);
   const [name, setName] = createSignal(initialName);
-
+  const [disabled, setDisabled] = createSignal(false);
   const toggleEditable = () => setEditable(!editable());
 
+  // This is until we have something to delete
+  createEffect(() => {
+    if (disabled()) {
+      setTimeout(() => {
+        setDisabled(false);
+      }, 1000);
+    }
+  });
+
   return (
-    <div class="flex flex-row border-solid border-white border rounded p-2">
-      <Show
-        when={!editable()}
-        fallback={
-          <EditableItem
+    <Show when={!disabled()} fallback={null}>
+      <div class="flex flex-row justify-between border-solid border-white border rounded">
+        <Show
+          when={!editable()}
+          fallback={
+            <EditableItem
+              name={name() ?? "New Chat"}
+              setName={setName}
+              toggleEditable={toggleEditable}
+            />
+          }
+        >
+          <NonEditableItem
             name={name() ?? "New Chat"}
-            setName={setName}
             toggleEditable={toggleEditable}
+            setDisabled={setDisabled}
           />
-        }
-      >
-        <NonEditableItem
-          name={name() ?? "New Chat"}
-          toggleEditable={toggleEditable}
-        />
-      </Show>
-    </div>
+        </Show>
+      </div>
+    </Show>
   );
 };
 

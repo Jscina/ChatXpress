@@ -2,6 +2,7 @@ import { onMount, createSignal, For } from "solid-js";
 import clsx from "clsx";
 import UserProfile from "./UserProfile";
 import HistoryItem from "./HistoryItem";
+import { Button } from "./ui/button";
 import type { Thread } from "../types";
 
 interface SidebarProps {
@@ -31,17 +32,17 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
         )}
       >
         <div class="flex-none">
-          <div class="flex flex-row mt-3 justify-center">
-            <button class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-3 mb-3">
+          <div class="flex flex-row mt-3 justify-center gap-5">
+            <Button class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-4 mb-3 bg-transparent">
               <i class="fa-solid fa-plus mr-1"></i>
               <p>New Chat</p>
-            </button>
-            <button
-              class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-3 mb-3"
+            </Button>
+            <Button
               onClick={toggleSidebar}
+              class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-4 mb-3 bg-transparent"
             >
               <i class="fa-solid fa-x"></i>
-            </button>
+            </Button>
           </div>
           <hr />
         </div>

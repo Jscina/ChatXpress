@@ -2,6 +2,8 @@ use crate::{
     schemas::{Assistant, Thread},
     BotState,
 };
+use async_openai::types::{MessageContent, MessageRole};
+use std::collections::HashMap;
 
 #[tauri::command(async, rename_all = "snake_case")]
 pub async fn delete_thread(
@@ -37,7 +39,7 @@ pub async fn create_thread(state: tauri::State<'_, BotState>) -> Result<Thread, 
 pub async fn get_history(
     thread_id: String,
     state: tauri::State<'_, BotState>,
-) -> Result<(), String> {
+) -> Result<HashMap<String, String>, String> {
     let bot = {
         let state_guard = state.0.lock().unwrap();
         state_guard.bot.clone()
@@ -45,10 +47,29 @@ pub async fn get_history(
     let history = bot.get_history(&thread_id).await;
     match history {
         Ok(history) => {
-            history.data.iter().for_each(|message| {
-                println!("{:?}: {:?}", message.role, message.content);
-            });
-            Ok(())
+            let history = history
+                .data
+                .iter()
+                .map(|message| {
+                    let role = match message.role {
+                        MessageRole::User => "user",
+                        MessageRole::Assistant => "assistant",
+                    }
+                    .to_string();
+
+                    let content = message
+                        .content
+                        .iter()
+                        .map(|content| match content {
+                            MessageContent::Text(text) => text.text.value.clone(),
+                            _ => "".into(),
+                        })
+                        .collect::<Vec<String>>()
+                        .join("");
+                    (role, content)
+                })
+                .collect::<HashMap<String, String>>();
+            Ok(history)
         }
         Err(_) => Err("Failed to get history".into()),
     }

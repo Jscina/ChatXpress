@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 extern crate chatxpress;
-use chatxpress::{assistant::*, assistant_crud::*, history_crud::*, BotState, Database, State};
+use chatxpress::{assistant::*, history_crud::*, BotState, Database, State};
 use dotenv::dotenv;
 use std::sync::{Arc, Mutex};
 use tokio::runtime::Runtime;
@@ -29,11 +29,6 @@ fn main() {
             history_read_all,
             history_update,
             history_delete,
-            assistant_read_one,
-            assistant_read_all,
-            assistant_update,
-            assistant_delete,
-            assistant_create,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

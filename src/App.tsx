@@ -5,11 +5,13 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
+import type { Assistant } from "./types";
 import { listAssistants } from "./api/assistant";
 
 const App = () => {
   const [isSidebarOpen, setSidebarOpen] = createSignal<boolean>(false);
   const [message, setMessage] = createSignal<string>("");
+  const [activeAssistant, setActiveAssistant] = createSignal<Assistant>();
 
   onMount(async () => {
     const assistants = await listAssistants();
@@ -19,7 +21,11 @@ const App = () => {
 
   return (
     <>
-      <Header isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <Header
+        isSidebarOpen={isSidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        setActiveAssistant={setActiveAssistant}
+      />
       <Sidebar isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} />
       <main
         class={clsx(
@@ -33,7 +39,10 @@ const App = () => {
       >
         <div class="flex flex-col p-8 mt-16 bg-light dark:bg-dark h-screen justify-center items-center">
           <ChatWindow message={message} setMessage={setMessage} />
-          <ChatInput setMessage={setMessage} />
+          <ChatInput
+            setMessage={setMessage}
+            activeAssistant={activeAssistant}
+          />
         </div>
       </main>
     </>

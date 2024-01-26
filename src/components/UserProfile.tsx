@@ -25,7 +25,6 @@ const UserProfile = () => {
   const [showMenu, setShowMenu] = createSignal(false);
   const [darkMode, setDarkMode] = createSignal(false);
   const [displayName, setDisplayName] = createSignal("");
-  const [apiKey, setApiKey] = createSignal("");
   const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement>();
   const [menuRef, setMenuRef] = createSignal<HTMLDivElement>();
 
@@ -97,8 +96,6 @@ const UserProfile = () => {
         </div>
       </Show>
       <SettingsMenu
-        apiKey={apiKey}
-        setApiKey={setApiKey}
         dialogRef={dialogRef}
         setDialogRef={setDialogRef}
         closeSettings={closeSettings}

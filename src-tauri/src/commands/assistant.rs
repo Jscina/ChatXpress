@@ -2,8 +2,11 @@ use crate::{
     schemas::{Assistant, Thread},
     BotState,
 };
+
 use async_openai::types::{MessageContent, MessageRole};
+use dotenv::dotenv;
 use std::collections::HashMap;
+use tokio::fs;
 
 #[tauri::command(async, rename_all = "snake_case")]
 pub async fn delete_thread(
@@ -131,4 +134,25 @@ pub async fn list_assistants(state: tauri::State<'_, BotState>) -> Result<Vec<As
         })
         .collect::<Vec<Assistant>>();
     Ok(res)
+}
+
+#[tauri::command(async, rename_all = "snake_case")]
+pub async fn read_api_key() -> Result<String, String> {
+    let api_key = std::env::var("OPENAI_API_KEY");
+    match api_key {
+        Ok(api_key) => Ok(api_key),
+        Err(_) => Err("Failed to read api key".to_string()),
+    }
+}
+
+#[tauri::command(async, rename_all = "snake_case")]
+pub async fn write_api_key(api_key: String) -> Result<(), String> {
+    let res = fs::write(".env", format!("OPENAI_API_KEY = {api_key}")).await;
+    match res {
+        Ok(_) => {
+            dotenv().ok();
+            Ok(())
+        }
+        Err(_) => Err("Failed to write api key".to_string()),
+    }
 }

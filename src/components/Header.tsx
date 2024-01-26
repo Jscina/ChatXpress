@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { createSignal, onMount } from "solid-js";
+import { createSignal, onMount, createEffect } from "solid-js";
 import { listAssistants } from "../api/assistant";
 import {
   Select,
@@ -10,21 +10,40 @@ import {
 } from "./ui/select";
 
 import { Button } from "./ui/button";
+import type { Assistant } from "../types";
 
 interface HeaderProps {
+  setActiveAssistant: (assistant: Assistant) => void;
   setSidebarOpen: (val: boolean) => void;
   isSidebarOpen: () => boolean;
 }
 
-const Header = ({ setSidebarOpen, isSidebarOpen }: HeaderProps) => {
+const Header = ({
+  setSidebarOpen,
+  isSidebarOpen,
+  setActiveAssistant,
+}: HeaderProps) => {
   const [selectedAssistant, setSelectedAssistant] = createSignal<string>("");
   const [assistants, setAssistants] = createSignal<string[]>([]);
+  const [availableAssistants, setAvailableAssistants] = createSignal<
+    Assistant[]
+  >([]);
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen());
   };
 
+  createEffect(() => {
+    if (selectedAssistant() === "") return;
+    const available = availableAssistants();
+    if (available.length === 0) return;
+    const assistant = available.find(
+      (value) => value.name === selectedAssistant(),
+    )!;
+    setActiveAssistant(assistant);
+  });
   onMount(async () => {
     const assistants = await listAssistants();
+    setAvailableAssistants(assistants);
     setAssistants(assistants.map((assistant) => assistant.name));
   });
 

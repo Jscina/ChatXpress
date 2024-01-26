@@ -29,6 +29,8 @@ fn main() {
             history_read_all,
             history_update,
             history_delete,
+            read_api_key,
+            write_api_key,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

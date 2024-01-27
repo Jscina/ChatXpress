@@ -1,27 +1,46 @@
-import { createSignal, createEffect } from "solid-js";
+import { createSignal } from "solid-js";
 
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
+import { conversation } from "../api/assistant";
 
-import type { Assistant } from "../types";
+import type { Assistant, Thread } from "../types";
 
 interface ChatInputProps {
+  setCurrentMessage: (message: string) => void;
   activeAssistant: () => Assistant | undefined;
-  setMessage: (message: string) => void;
+  setAssistantResponse: (val: string) => void;
+  setActiveThread: (val: Thread) => void;
+  activeThread: () => Thread | undefined;
 }
 
-const ChatInput = ({ setMessage, activeAssistant }: ChatInputProps) => {
+const ChatInput = ({
+  setCurrentMessage,
+  activeAssistant,
+  setAssistantResponse,
+  setActiveThread,
+  activeThread,
+}: ChatInputProps) => {
   const [messageRef, setMessageRef] = createSignal<HTMLTextAreaElement>();
   const [messageInput, setMessageInput] = createSignal("");
 
-  const sendMessage = (e: Event) => {
+  const sendMessage = async (e: Event) => {
     e.preventDefault();
 
     const promptInput = messageInput();
     const textArea = messageRef();
 
     if (textArea) textArea.value = "";
-    if (promptInput !== "") setMessage(promptInput);
+    if (promptInput !== "") setCurrentMessage(promptInput);
+
+    const assistant = activeAssistant();
+    if (!assistant) return;
+
+    const response = await conversation(promptInput, assistant);
+    setAssistantResponse(response.content);
+
+    if (activeThread() === response.thread) return;
+    setActiveThread(response.thread);
   };
 
   const handleInput = (e: any) => {
@@ -35,9 +54,6 @@ const ChatInput = ({ setMessage, activeAssistant }: ChatInputProps) => {
     }
   };
 
-  createEffect(async () => {
-    console.log(activeAssistant());
-  });
   return (
     <div class="flex flex-col mb-4 items-center max-w-[50%] w-full min-w-min py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out">
       <form class="m-0 w-full flex flex-col gap-2" onSubmit={sendMessage}>

@@ -42,7 +42,7 @@ pub async fn create_thread(state: tauri::State<'_, BotState>) -> Result<Thread, 
 pub async fn get_history(
     thread_id: String,
     state: tauri::State<'_, BotState>,
-) -> Result<HashMap<String, String>, String> {
+) -> Result<Vec<HashMap<String, String>>, String> {
     let bot = {
         let state_guard = state.0.lock().unwrap();
         state_guard.bot.clone()
@@ -71,7 +71,15 @@ pub async fn get_history(
                         .join("");
                     (role, content)
                 })
-                .collect::<HashMap<String, String>>();
+                .collect::<Vec<(String, String)>>()
+                .iter()
+                .map(|(role, content)| {
+                    let mut map = HashMap::new();
+                    map.insert("role".into(), role.clone());
+                    map.insert("content".into(), content.clone());
+                    map
+                })
+                .collect();
             Ok(history)
         }
         Err(_) => Err("Failed to get history".into()),

@@ -1,31 +1,45 @@
-import { createSignal, onMount, createEffect, Index } from "solid-js";
+import { onMount, createEffect, Index } from "solid-js";
 import AssistantMessage from "./AssistantMessage";
 import UserMessage from "./UserMessage";
 import { AIRole, type ChatMessage } from "../types";
 
 interface ChatWindowProps {
-  message: () => string;
-  setMessage: (message: string) => void;
+  currentMessage: () => string;
+  setCurrentMessage: (val: string) => void;
+  assistantResponse: () => string;
+  setAssistantResponse: (val: string) => void;
+  history: () => ChatMessage[] | null;
+  setHistory: (val: ChatMessage[] | null) => void;
 }
 
-const ChatWindow = ({ message }: ChatWindowProps) => {
-  const [history, setHistory] = createSignal<ChatMessage[] | null>(null);
-
+const ChatWindow = ({
+  currentMessage,
+  setCurrentMessage,
+  assistantResponse,
+  setAssistantResponse,
+  history,
+  setHistory,
+}: ChatWindowProps) => {
   createEffect(() => {
     const currentHistory = history() ?? [];
-    const newMessage = message();
-    const lastMessage = currentHistory[currentHistory.length - 1];
-    if (
-      message() !== "" &&
-      (!lastMessage || newMessage !== lastMessage.content)
-    ) {
+    if (currentMessage() !== "") {
       setHistory([
         ...currentHistory,
         {
           role: AIRole.USER,
-          content: message(),
+          content: currentMessage(),
         },
       ]);
+      setCurrentMessage("");
+    } else if (assistantResponse() !== "") {
+      setHistory([
+        ...currentHistory,
+        {
+          role: AIRole.ASSISTANT,
+          content: assistantResponse(),
+        },
+      ]);
+      setAssistantResponse("");
     }
   });
 

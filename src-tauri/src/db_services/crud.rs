@@ -1,21 +1,6 @@
 use crate::{models::HistoryEntry, Database};
 use sqlx::Error;
 
-/// Read a thread from the database by its ID.
-pub async fn history_read_one(
-    db: &Database,
-    id: u32,
-    thread_id: &str,
-) -> Result<HistoryEntry, Error> {
-    let query = include_str!("./sql/history/read_one.sql");
-    let result = sqlx::query_as::<_, HistoryEntry>(query)
-        .bind(id)
-        .bind(thread_id)
-        .fetch_one(&db.pool)
-        .await?;
-    Ok(result)
-}
-
 /// Read all threads from the database.
 pub async fn history_read_all(db: &Database) -> Result<Vec<HistoryEntry>, Error> {
     let query = include_str!("./sql/history/read_all.sql");

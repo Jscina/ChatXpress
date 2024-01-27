@@ -25,7 +25,6 @@ fn main() {
             list_assistants,
             create_thread,
             delete_thread,
-            history_read_one,
             history_read_all,
             history_update,
             history_delete,

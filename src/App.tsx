@@ -1,24 +1,19 @@
-import { createSignal, onMount } from "solid-js";
+import { createSignal } from "solid-js";
 import "highlight.js/styles/github.css";
 import clsx from "clsx";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
-import type { Assistant } from "./types";
-import { listAssistants } from "./api/assistant";
+import type { Assistant, Thread, ChatMessage } from "./types";
 
 const App = () => {
   const [isSidebarOpen, setSidebarOpen] = createSignal<boolean>(false);
-  const [message, setMessage] = createSignal<string>("");
+  const [assistantResponse, setAssistantResponse] = createSignal<string>("");
+  const [currentMessage, setCurrentMessage] = createSignal<string>("");
   const [activeAssistant, setActiveAssistant] = createSignal<Assistant>();
-
-  onMount(async () => {
-    const assistants = await listAssistants();
-
-    console.log(assistants[0]);
-  });
-
+  const [activeThread, setActiveThread] = createSignal<Thread>();
+  const [history, setHistory] = createSignal<ChatMessage[] | null>(null);
   return (
     <>
       <Header
@@ -26,7 +21,11 @@ const App = () => {
         setSidebarOpen={setSidebarOpen}
         setActiveAssistant={setActiveAssistant}
       />
-      <Sidebar isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        setActiveThread={setActiveThread}
+      />
       <main
         class={clsx(
           "h-screen bg-light dark:bg-dark text-primary-dark dark:text-primary-light flex-grow overflow-hidden relative transition-transform ease-in-out duration-300",
@@ -38,10 +37,20 @@ const App = () => {
         )}
       >
         <div class="flex flex-col p-8 mt-16 bg-light dark:bg-dark h-screen justify-center items-center">
-          <ChatWindow message={message} setMessage={setMessage} />
+          <ChatWindow
+            currentMessage={currentMessage}
+            setCurrentMessage={setCurrentMessage}
+            assistantResponse={assistantResponse}
+            setAssistantResponse={setAssistantResponse}
+            history={history}
+            setHistory={setHistory}
+          />
           <ChatInput
-            setMessage={setMessage}
+            setCurrentMessage={setCurrentMessage}
             activeAssistant={activeAssistant}
+            setAssistantResponse={setAssistantResponse}
+            setActiveThread={setActiveThread}
+            activeThread={activeThread}
           />
         </div>
       </main>

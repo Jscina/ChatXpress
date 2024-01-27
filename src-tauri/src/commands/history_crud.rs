@@ -16,23 +16,6 @@ pub async fn history_read_all(
 }
 
 #[tauri::command(async, rename_all = "snake_case")]
-pub async fn history_read_one(
-    id: u32,
-    thread_id: String,
-    state: tauri::State<'_, BotState>,
-) -> Result<HistoryEntry, String> {
-    let db = {
-        let state_guard = state.0.lock().unwrap();
-        state_guard.db.clone()
-    };
-    let res = crud::history_read_one(&db, id, &thread_id).await;
-    match res {
-        Ok(entry) => Ok(entry),
-        Err(_) => Err("Failed to read entry".into()),
-    }
-}
-
-#[tauri::command(async, rename_all = "snake_case")]
 pub async fn history_update(
     id: u32,
     thread_id: String,

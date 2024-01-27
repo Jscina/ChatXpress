@@ -11,8 +11,7 @@ export type ChatMessage = {
 };
 
 export type Assistant = {
-  id?: number;
-  assistant_id?: string;
+  id: string;
   name: string;
   description: string;
   model: string;
@@ -24,4 +23,16 @@ export type Thread = {
   id: string;
   name?: string;
   messages?: ChatMessage[];
+};
+
+export type Chat = {
+  content: string;
+  thread: Thread;
+};
+
+export type HistoryEntry = {
+  id: number;
+  thread_id: string;
+  thread_name: string;
+  created_at: string;
 };

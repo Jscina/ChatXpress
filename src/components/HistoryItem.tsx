@@ -1,6 +1,7 @@
 import { createSignal, createEffect, Show } from "solid-js";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import type { Thread } from "../types";
 
 interface EditableItemProps {
   name: string;
@@ -48,20 +49,30 @@ const EditableItem = ({ name, setName, toggleEditable }: EditableItemProps) => {
 };
 
 interface NonEditableItemProps {
-  name: string;
+  thread: Thread;
   toggleEditable: () => void;
   setDisabled: (val: boolean) => void;
+  setActiveThread: (val: Thread) => void;
 }
 
 const NonEditableItem = ({
-  name,
+  thread,
   toggleEditable,
   setDisabled,
+  setActiveThread,
 }: NonEditableItemProps) => {
+  const loadHistory = () => {
+    setActiveThread(thread);
+  };
   return (
     <>
       <div class="flex justify-between w-full">
-        <Button class="bg-transparent hover:bg-transparent">{name}</Button>
+        <Button
+          class="bg-transparent hover:bg-transparent"
+          onClick={loadHistory}
+        >
+          {thread.name ?? "New Chat"}
+        </Button>
         <div class="flex gap-1">
           <Button
             class="flex p-2 hover:text-neutral-500 bg-transparent hover:bg-transparent"
@@ -84,12 +95,13 @@ const NonEditableItem = ({
 };
 
 interface HistoryItemProps {
-  initialName?: string;
+  thread: Thread;
+  setActiveThread: (val: Thread) => void;
 }
 
-const HistoryItem = ({ initialName }: HistoryItemProps) => {
+const HistoryItem = ({ thread, setActiveThread }: HistoryItemProps) => {
   const [editable, setEditable] = createSignal(false);
-  const [name, setName] = createSignal(initialName);
+  const [name, setName] = createSignal(thread.name);
   const [disabled, setDisabled] = createSignal(false);
   const toggleEditable = () => setEditable(!editable());
 
@@ -100,6 +112,10 @@ const HistoryItem = ({ initialName }: HistoryItemProps) => {
         setDisabled(false);
       }, 1000);
     }
+  });
+
+  createEffect(() => {
+    thread.name = name();
   });
 
   return (
@@ -116,9 +132,10 @@ const HistoryItem = ({ initialName }: HistoryItemProps) => {
           }
         >
           <NonEditableItem
-            name={name() ?? "New Chat"}
+            thread={thread}
             toggleEditable={toggleEditable}
             setDisabled={setDisabled}
+            setActiveThread={setActiveThread}
           />
         </Show>
       </div>

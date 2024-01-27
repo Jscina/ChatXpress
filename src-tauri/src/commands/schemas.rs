@@ -35,8 +35,7 @@ impl Thread {
 
 #[derive(Deserialize, Serialize)]
 pub struct Assistant {
-    id: u32,
-    assistant_id: String,
+    id: String,
     name: Option<String>,
     description: Option<String>,
     model: Option<String>,
@@ -54,8 +53,7 @@ impl Assistant {
         tools: Option<Vec<String>>,
     ) -> Self {
         Self {
-            id: 0,
-            assistant_id: id,
+            id,
             name,
             description,
             model,

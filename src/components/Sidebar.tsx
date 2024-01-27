@@ -3,21 +3,34 @@ import clsx from "clsx";
 import UserProfile from "./UserProfile";
 import HistoryItem from "./HistoryItem";
 import { Button } from "./ui/button";
-import type { Thread } from "../types";
+import type { Thread, ChatMessage } from "../types";
+import { listThreads } from "../api/database";
 
 interface SidebarProps {
   setSidebarOpen: (val: boolean) => void;
   isSidebarOpen: () => boolean;
+  setActiveThread: (val: Thread | undefined) => void;
+  setHistory: (val: ChatMessage[] | null) => void;
 }
 
-const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
+const Sidebar = ({
+  setSidebarOpen,
+  isSidebarOpen,
+  setActiveThread,
+}: SidebarProps) => {
   const [history, setHistory] = createSignal<Thread[] | null>(null);
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen());
   };
 
+  const handleNewChat = () => {
+    setActiveThread(undefined);
+    setHistory(null);
+  };
+
   onMount(async () => {
-    setHistory([{ id: "1", name: "test", messages: [] }]);
+    const threads = await listThreads();
+    setHistory(threads);
   });
 
   return (
@@ -33,7 +46,10 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
       >
         <div class="flex-none">
           <div class="flex flex-row mt-3 justify-center gap-5">
-            <Button class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-4 mb-3 bg-transparent">
+            <Button
+              onClick={handleNewChat}
+              class="flex items-center self-center rounded text-white hover:bg-gray-600 dark:hover:bg-gray-700 p-4 mb-3 bg-transparent"
+            >
               <i class="fa-solid fa-plus mr-1"></i>
               <p>New Chat</p>
             </Button>
@@ -50,7 +66,12 @@ const Sidebar = ({ setSidebarOpen, isSidebarOpen }: SidebarProps) => {
           <For each={history()}>
             {(message, _) => {
               if (message) {
-                return <HistoryItem initialName={message.name} />;
+                return (
+                  <HistoryItem
+                    thread={message}
+                    setActiveThread={setActiveThread}
+                  />
+                );
               }
             }}
           </For>

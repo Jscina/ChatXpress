@@ -10,13 +10,14 @@ interface SidebarProps {
   setSidebarOpen: (val: boolean) => void;
   isSidebarOpen: () => boolean;
   setActiveThread: (val: Thread | undefined) => void;
-  setHistory: (val: ChatMessage[] | null) => void;
+  setChatHistory: (val: ChatMessage[] | null) => void;
 }
 
 const Sidebar = ({
   setSidebarOpen,
   isSidebarOpen,
   setActiveThread,
+  setChatHistory,
 }: SidebarProps) => {
   const [history, setHistory] = createSignal<Thread[] | null>(null);
   const toggleSidebar = () => {
@@ -25,7 +26,7 @@ const Sidebar = ({
 
   const handleNewChat = () => {
     setActiveThread(undefined);
-    setHistory(null);
+    setChatHistory(null);
   };
 
   onMount(async () => {

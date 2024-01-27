@@ -8,8 +8,8 @@ interface ChatWindowProps {
   setCurrentMessage: (val: string) => void;
   assistantResponse: () => string;
   setAssistantResponse: (val: string) => void;
-  history: () => ChatMessage[] | null;
-  setHistory: (val: ChatMessage[] | null) => void;
+  chatHistory: () => ChatMessage[] | null;
+  setChatHistory: (val: ChatMessage[] | null) => void;
 }
 
 const ChatWindow = ({
@@ -17,13 +17,13 @@ const ChatWindow = ({
   setCurrentMessage,
   assistantResponse,
   setAssistantResponse,
-  history,
-  setHistory,
+  chatHistory,
+  setChatHistory,
 }: ChatWindowProps) => {
   createEffect(() => {
-    const currentHistory = history() ?? [];
+    const currentHistory = chatHistory() ?? [];
     if (currentMessage() !== "") {
-      setHistory([
+      setChatHistory([
         ...currentHistory,
         {
           role: AIRole.USER,
@@ -32,7 +32,7 @@ const ChatWindow = ({
       ]);
       setCurrentMessage("");
     } else if (assistantResponse() !== "") {
-      setHistory([
+      setChatHistory([
         ...currentHistory,
         {
           role: AIRole.ASSISTANT,
@@ -44,7 +44,7 @@ const ChatWindow = ({
   });
 
   onMount(() => {
-    setHistory(null);
+    setChatHistory(null);
   });
 
   return (
@@ -53,7 +53,7 @@ const ChatWindow = ({
         <div class="flex">
           <div class="space-y-4 overflow-y-scroll overflow-x-hidden flex-grow shadowflex flex-col shadow-lg rounded-lg transition-all duration-300 ease-in-out max-h-45">
             <div class="flex flex-col justify-center self-center border-none rounded-lg">
-              <Index each={history()}>
+              <Index each={chatHistory()}>
                 {(entry) => {
                   switch (entry().role) {
                     case AIRole.USER:

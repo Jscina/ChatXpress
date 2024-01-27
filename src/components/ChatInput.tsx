@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { conversation } from "../api/assistant";
+import { createThread } from "../api/database";
 
 import type { Assistant, Thread } from "../types";
 
@@ -40,6 +41,7 @@ const ChatInput = ({
     setAssistantResponse(response.content);
 
     if (activeThread() === response.thread) return;
+    createThread(response.thread);
     setActiveThread(response.thread);
   };
 

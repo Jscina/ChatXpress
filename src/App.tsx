@@ -13,7 +13,9 @@ const App = () => {
   const [currentMessage, setCurrentMessage] = createSignal<string>("");
   const [activeAssistant, setActiveAssistant] = createSignal<Assistant>();
   const [activeThread, setActiveThread] = createSignal<Thread>();
-  const [history, setHistory] = createSignal<ChatMessage[] | null>(null);
+  const [chatHistory, setChatHistory] = createSignal<ChatMessage[] | null>(
+    null,
+  );
   return (
     <>
       <Header
@@ -25,6 +27,7 @@ const App = () => {
         isSidebarOpen={isSidebarOpen}
         setSidebarOpen={setSidebarOpen}
         setActiveThread={setActiveThread}
+        setChatHistory={setChatHistory}
       />
       <main
         class={clsx(
@@ -42,8 +45,8 @@ const App = () => {
             setCurrentMessage={setCurrentMessage}
             assistantResponse={assistantResponse}
             setAssistantResponse={setAssistantResponse}
-            history={history}
-            setHistory={setHistory}
+            chatHistory={chatHistory}
+            setChatHistory={setChatHistory}
           />
           <ChatInput
             setCurrentMessage={setCurrentMessage}

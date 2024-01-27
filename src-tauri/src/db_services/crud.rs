@@ -3,10 +3,11 @@ use sqlx::Error;
 
 /// Read all threads from the database.
 pub async fn history_read_all(db: &Database) -> Result<Vec<HistoryEntry>, Error> {
-    let query = include_str!("./sql/history/read_all.sql");
+    let query = include_str!("./sql/history/read.sql");
     let result = sqlx::query_as::<_, HistoryEntry>(query)
         .fetch_all(&db.pool)
         .await?;
+    println!("{:?}", result);
     Ok(result)
 }
 

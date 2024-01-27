@@ -45,7 +45,7 @@ const AssistantMessage = ({ message }: AssistantMessageProps) => {
     <Show when={!errorOccured()} fallback={<ErrorMessage />}>
       <div class="flex justify-center p-4">
         <div class="flex p-2 max-w-[50%] w-full">
-          <div class="flex" innerHTML={markdownContent()} />
+          <div class="flex flex-col" innerHTML={markdownContent()} />
         </div>
       </div>
     </Show>

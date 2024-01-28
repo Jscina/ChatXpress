@@ -17,7 +17,7 @@ const ErrorMessage = ({ activeAssistant }: ErrorMessageProps) => {
   return (
     <Show when={activeAssistant() === undefined}>
       <div class="flex justify-center p-4">
-        <p class="border-solid border-2 border-yellow-300 bg-yellow-100 p-4 rounded">
+        <p class="border-solid border-2 border-yellow-300 bg-yellow-100 p-4 rounded dark:text-black">
           Chat will be disbaled until an assistant is selected.
         </p>
       </div>

@@ -120,15 +120,6 @@ const HistoryItem = ({ thread, setActiveThread }: HistoryItemProps) => {
   const [disabled, setDisabled] = createSignal(false);
   const toggleEditable = () => setEditable(!editable());
 
-  // This is until we have something to delete
-  createEffect(() => {
-    if (disabled()) {
-      setTimeout(() => {
-        setDisabled(false);
-      }, 1000);
-    }
-  });
-
   createEffect(() => {
     thread.name = name();
   });

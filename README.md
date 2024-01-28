@@ -17,6 +17,7 @@
 - **Tauri**: [Official Documentation](https://tauri.app/v1/guides/)
 - **TailwindCSS**: [Official Documentation](https://tailwindcss.com/)
 - **SolidJS**: [Official Documentation](https://www.solidjs.com/guides/getting-started)
+- **SolidUI** [Official Documentation](https://www.solid-ui.com/)
 - **OpenAI API**: [API Reference](https://beta.openai.com/docs/api-reference/introduction)
 
 ## ⚙️ Setup and Running the App:

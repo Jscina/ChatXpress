@@ -22,6 +22,7 @@
 
 ## Manual:
 [Install Rust](https://www.rust-lang.org/tools/install)
+
 Install Tauri Cli
 ```bash
   cargo install tauri-cli

@@ -1,15 +1,22 @@
 import { createSignal, createEffect, Show } from "solid-js";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { deleteThread, updateThread } from "../api/database";
 import type { Thread } from "../types";
 
 interface EditableItemProps {
   name: string;
+  thread: Thread;
   setName: (val: string) => void;
   toggleEditable: () => void;
 }
 
-const EditableItem = ({ name, setName, toggleEditable }: EditableItemProps) => {
+const EditableItem = ({
+  name,
+  thread,
+  setName,
+  toggleEditable,
+}: EditableItemProps) => {
   const [newName, setNewName] = createSignal(name);
 
   const updateName = () => {
@@ -18,6 +25,13 @@ const EditableItem = ({ name, setName, toggleEditable }: EditableItemProps) => {
     }
     toggleEditable();
   };
+
+  createEffect(() => {
+    if (newName() !== "") {
+      thread.name = newName();
+      updateThread(thread);
+    }
+  });
 
   return (
     <>
@@ -83,6 +97,7 @@ const NonEditableItem = ({
           <Button
             onClick={() => {
               setDisabled(true);
+              deleteThread(thread);
             }}
             class="flex p-2 hover:text-red-500 bg-transparent hover:bg-transparent"
           >
@@ -125,6 +140,7 @@ const HistoryItem = ({ thread, setActiveThread }: HistoryItemProps) => {
           when={!editable()}
           fallback={
             <EditableItem
+              thread={thread}
               name={name() ?? "New Chat"}
               setName={setName}
               toggleEditable={toggleEditable}

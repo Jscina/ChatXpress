@@ -1,4 +1,4 @@
 INSERT INTO
-    history
+   CHAT_HISTORY (thread_id, thread_name)
 VALUES
-    (?, ?, CURRENT_TIMESTAMP);
+    (?, ?);

@@ -39,6 +39,6 @@ export async function conversation(
   } as Chat;
 }
 
-export async function getHistory(thread: Thread): Promise<ChatMessage> {
+export async function getHistory(thread: Thread): Promise<ChatMessage[]> {
   return await invoke("get_history", { thread_id: thread.id });
 }

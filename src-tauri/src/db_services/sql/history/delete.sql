@@ -1,1 +1,1 @@
-DELETE FROM history WHERE id = ? AND thread_id = ?;
+DELETE FROM CHAT_HISTORY WHERE thread_id = ?;

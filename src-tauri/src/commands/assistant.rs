@@ -20,7 +20,7 @@ pub async fn delete_thread(
     let res = bot.delete_thread(&thread.id).await;
     match res {
         Ok(_) => Ok(()),
-        Err(_) => Err("Failed to delete thread".to_string()),
+        Err(e) => Err(e.to_string()),
     }
 }
 
@@ -34,7 +34,7 @@ pub async fn create_thread(state: tauri::State<'_, BotState>) -> Result<Thread, 
 
     match thread {
         Ok(thread) => Ok(Thread::new(thread.id, None, None)),
-        Err(_) => Err("Failed to create thread".to_string()),
+        Err(e) => Err(e.to_string()),
     }
 }
 
@@ -82,7 +82,7 @@ pub async fn get_history(
                 .collect();
             Ok(history)
         }
-        Err(_) => Err("Failed to get history".into()),
+        Err(e) => Err(e.to_string()),
     }
 }
 
@@ -115,7 +115,7 @@ pub async fn conversation(
             response,
             thread_copy.unwrap_or(Thread::new(thread_obj.id, None, None)),
         )),
-        Err(_) => Err("Failed to get assistant response".to_string()),
+        Err(e) => Err(e.to_string()),
     }
 }
 
@@ -149,7 +149,7 @@ pub async fn read_api_key() -> Result<String, String> {
     let api_key = std::env::var("OPENAI_API_KEY");
     match api_key {
         Ok(api_key) => Ok(api_key),
-        Err(_) => Err("Failed to read api key".to_string()),
+        Err(e) => Err(e.to_string()),
     }
 }
 
@@ -161,6 +161,6 @@ pub async fn write_api_key(api_key: String) -> Result<(), String> {
             dotenv().ok();
             Ok(())
         }
-        Err(_) => Err("Failed to write api key".to_string()),
+        Err(e) => Err(e.to_string()),
     }
 }

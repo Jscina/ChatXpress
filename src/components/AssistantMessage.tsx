@@ -22,7 +22,7 @@ interface AssistantMessageProps {
 }
 
 const AssistantMessage = ({ message }: AssistantMessageProps) => {
-  const [markdownContent, setMarkdownContent] = createSignal<string>(message);
+  const [markdownContent, setMarkdownContent] = createSignal<string>("");
   const [errorOccured, setErrorOccured] = createSignal<boolean>(false);
 
   onMount(async () => {

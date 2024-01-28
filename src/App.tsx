@@ -26,7 +26,9 @@ const App = () => {
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        activeThread={activeThread}
         setActiveThread={setActiveThread}
+        chatHistory={chatHistory}
         setChatHistory={setChatHistory}
       />
       <main
@@ -41,12 +43,14 @@ const App = () => {
       >
         <div class="flex flex-col p-8 mt-16 bg-light dark:bg-dark h-screen justify-center items-center">
           <ChatWindow
+            activeAssistant={activeAssistant}
             currentMessage={currentMessage}
             setCurrentMessage={setCurrentMessage}
             assistantResponse={assistantResponse}
             setAssistantResponse={setAssistantResponse}
             chatHistory={chatHistory}
             setChatHistory={setChatHistory}
+            activeThread={activeThread}
           />
           <ChatInput
             setCurrentMessage={setCurrentMessage}

@@ -1,4 +1,4 @@
-import { onMount, createSignal, For } from "solid-js";
+import { onMount, createEffect, createSignal, For } from "solid-js";
 import clsx from "clsx";
 import UserProfile from "./UserProfile";
 import HistoryItem from "./HistoryItem";
@@ -9,15 +9,19 @@ import { listThreads } from "../api/database";
 interface SidebarProps {
   setSidebarOpen: (val: boolean) => void;
   isSidebarOpen: () => boolean;
+  activeThread: () => Thread | undefined;
   setActiveThread: (val: Thread | undefined) => void;
+  chatHistory: () => ChatMessage[] | null;
   setChatHistory: (val: ChatMessage[] | null) => void;
 }
 
 const Sidebar = ({
   setSidebarOpen,
   isSidebarOpen,
+  activeThread,
   setActiveThread,
   setChatHistory,
+  chatHistory,
 }: SidebarProps) => {
   const [history, setHistory] = createSignal<Thread[] | null>(null);
   const toggleSidebar = () => {
@@ -28,6 +32,13 @@ const Sidebar = ({
     setActiveThread(undefined);
     setChatHistory(null);
   };
+
+  createEffect(async () => {
+    if (activeThread() === undefined && chatHistory() === null) {
+      const threads = await listThreads();
+      setHistory(threads);
+    }
+  });
 
   onMount(async () => {
     const threads = await listThreads();

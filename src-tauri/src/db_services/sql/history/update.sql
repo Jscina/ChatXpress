@@ -1,1 +1,1 @@
-UPDATE history SET thread_name = ? where id = ? AND thread_id = ?;
+UPDATE CHAT_HISTORY SET thread_name = ? where  thread_id = ?;

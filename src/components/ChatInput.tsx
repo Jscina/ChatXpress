@@ -1,10 +1,11 @@
-import { createSignal } from "solid-js";
+import { createSignal, createEffect } from "solid-js";
 
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { conversation } from "../api/assistant";
 import { createThread } from "../api/database";
 
+import clsx from "clsx";
 import type { Assistant, Thread } from "../types";
 
 interface ChatInputProps {
@@ -24,6 +25,7 @@ const ChatInput = ({
 }: ChatInputProps) => {
   const [messageRef, setMessageRef] = createSignal<HTMLTextAreaElement>();
   const [messageInput, setMessageInput] = createSignal("");
+  const [disabled, isDisabled] = createSignal<boolean>(false);
 
   const sendMessage = async (e: Event) => {
     e.preventDefault();
@@ -56,6 +58,14 @@ const ChatInput = ({
     }
   };
 
+  createEffect(() => {
+    if (activeAssistant() === undefined) {
+      isDisabled(true);
+    } else {
+      isDisabled(false);
+    }
+  });
+
   return (
     <div class="flex flex-col mb-4 items-center max-w-[50%] w-full min-w-min py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out">
       <form class="m-0 w-full flex flex-col gap-2" onSubmit={sendMessage}>
@@ -71,7 +81,14 @@ const ChatInput = ({
           ></Textarea>
           <Button
             type="submit"
-            class="w-10 h-10 p-2 rounded-md bg-green-500 hover:bg-green-400 text-white flex items-center justify-center"
+            disabled={disabled()}
+            class={clsx(
+              "w-10 h-10 p-2 rounded-md bg-green-500 hover:bg-green-400 text-white flex items-center justify-center",
+              {
+                "disabled:opacity-50 disabled:pointer-events-none":
+                  activeAssistant() === undefined,
+              },
+            )}
           >
             <i class="fa-solid fa-paper-plane"></i>
           </Button>

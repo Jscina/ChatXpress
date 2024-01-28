@@ -8,8 +8,8 @@
 
 - **Performance**: Written in Rust, ensuring a swift and responsive UI / chat experience.
 - **Sleek UI**: The interface mirrors the old ChatGPT interface, facilitating a familiar and seamless user experience.
+- **Customizable Chatbot**: This utilizes the assistants API to interact with the open ai API. So users can setup their assistants in the API and they will automatically be detected by the app. 
 - **[PLANNED] Spending Tracker**: An upcoming feature that will display the cost/token on the chat window to easily see how much you're spending.
-- **[PLANNED] Customizable Chatbot**: The user has access to all the parameters of the OpenAI API, enabling them to customize the chatbot to their liking.
 - **[PLANNED] Plugins**: An upcoming feature that lets users craft personalized plugins for the bot, enabling more dynamic interactions and responses.
 
 ## 📘 Relevant Documentation:

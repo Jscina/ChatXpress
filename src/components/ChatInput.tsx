@@ -37,13 +37,17 @@ const ChatInput = ({
     if (promptInput !== "") setCurrentMessage(promptInput);
 
     const assistant = activeAssistant();
+    const thread = activeThread();
     if (!assistant) return;
 
-    const response = await conversation(promptInput, assistant);
+    const response = await conversation(promptInput, assistant, thread);
     setAssistantResponse(response.content);
 
-    if (activeThread() === response.thread) return;
-    createThread(response.thread);
+    if (activeThread() === response.thread) {
+      console.log("Same thread");
+      return;
+    }
+    await createThread(response.thread);
     setActiveThread(response.thread);
   };
 

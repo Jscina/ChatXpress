@@ -1,4 +1,4 @@
-import { createSignal, onMount, createEffect, Index, Show } from "solid-js";
+import { createSignal, createEffect, Index, Show } from "solid-js";
 import AssistantMessage from "./AssistantMessage";
 import UserMessage from "./UserMessage";
 import { getHistory } from "../api/assistant";
@@ -62,14 +62,12 @@ const ChatWindow = ({
     } else if (assistantResponse() !== "") {
       setChatHistory([
         ...currentHistory,
-        {
-          role: AIRole.ASSISTANT,
-          content: assistantResponse(),
-        },
+        { role: AIRole.ASSISTANT, content: assistantResponse() },
       ]);
       setAssistantLoading(false);
       setAssistantResponse("");
     }
+    console.log(chatHistory());
   });
 
   createEffect(async () => {
@@ -79,35 +77,33 @@ const ChatWindow = ({
     setChatHistory(history.reverse());
   });
 
-  onMount(() => {
-    setChatHistory(null);
-  });
-
   return (
     <>
       <div class="flex-grow overflow-auto max-h-[calc(100vh-14rem)] w-full h-full">
         <div class="flex">
           <div class="space-y-4 overflow-y-scroll overflow-x-hidden flex-grow shadowflex flex-col shadow-lg rounded-lg transition-all duration-300 ease-in-out max-h-45">
             <div class="flex flex-col justify-center self-center border-none rounded-lg">
-              <Index each={chatHistory()}>
-                {(entry) => {
-                  switch (entry().role) {
-                    case AIRole.USER:
-                      return <UserMessage message={entry().content} />;
-                    case AIRole.ASSISTANT:
-                      return <AssistantMessage message={entry().content} />;
-                  }
-                }}
-              </Index>
               <Show
-                when={assistantLoading() && activeAssistant()}
+                when={activeAssistant() !== undefined}
                 fallback={<ErrorMessage activeAssistant={activeAssistant} />}
               >
-                <div class="flex justify-center p-4">
-                  <div class="flex justify-center items-center">
-                    <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-500"></div>
+                <Index each={chatHistory()}>
+                  {(entry) => {
+                    switch (entry().role) {
+                      case AIRole.USER:
+                        return <UserMessage message={entry().content} />;
+                      case AIRole.ASSISTANT:
+                        return <AssistantMessage message={entry().content} />;
+                    }
+                  }}
+                </Index>
+                <Show when={assistantLoading()}>
+                  <div class="flex justify-center p-4">
+                    <div class="flex justify-center items-center">
+                      <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-500"></div>
+                    </div>
                   </div>
-                </div>
+                </Show>
               </Show>
             </div>
           </div>

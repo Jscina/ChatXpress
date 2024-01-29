@@ -92,9 +92,7 @@
 
     --radius: 0.5rem;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -108,11 +106,14 @@
   body.dark {
     @apply bg-dark text-primary-light;
   }
-}
 
-@media (max-width: 640px) {
-  .container {
-    @apply px-4;
+  pre code.hljs {
+    @apply bg-black rounded max-w-fit;
+  }
+
+  @media (max-width: 640px) {
+    .container {
+      @apply px-4;
+    }
   }
 }
-

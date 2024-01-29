@@ -36,6 +36,7 @@ const Sidebar = ({
   createEffect(async () => {
     if (activeThread() === undefined && chatHistory() === null) {
       const threads = await listThreads();
+      console.log(threads);
       setHistory(threads);
     }
   });

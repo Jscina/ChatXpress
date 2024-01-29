@@ -1,6 +1,6 @@
 import { onMount, createSignal, Show } from "solid-js";
 import { marked } from "marked";
-import hljs from "highlight.js/lib/core";
+import hljs from "highlight.js";
 import DOMPurify from "dompurify";
 
 const ErrorMessage = () => {
@@ -45,7 +45,7 @@ const AssistantMessage = ({ message }: AssistantMessageProps) => {
     <Show when={!errorOccured()} fallback={<ErrorMessage />}>
       <div class="flex justify-center p-4">
         <div class="flex p-2 max-w-[50%] w-full">
-          <div class="flex flex-col" innerHTML={markdownContent()} />
+          <div class="w-full max-w-screen-lg" innerHTML={markdownContent()} />
         </div>
       </div>
     </Show>

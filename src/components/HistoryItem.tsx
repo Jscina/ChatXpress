@@ -1,8 +1,9 @@
 import { createSignal, createEffect, Show } from "solid-js";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Dialog, DialogContent, DialogDescription } from "./ui/dialog";
 import { deleteThread, updateThread } from "../api/database";
-import type { Thread } from "../types";
+import type { ChatMessage, Thread } from "../types";
 
 interface EditableItemProps {
   name: string;
@@ -62,22 +63,81 @@ const EditableItem = ({
   );
 };
 
+interface ConfirmDeleteProps {
+  thread: Thread;
+  open: () => boolean;
+  setOpen: (val: boolean) => void;
+  setDisabled: (val: boolean) => void;
+  activeThread: () => Thread | undefined;
+  setActiveThread: (val: Thread | undefined) => void;
+  setChatHistory: (val: ChatMessage[] | null) => void;
+}
+
+const ConfirmDelete = ({
+  thread,
+  open,
+  setOpen,
+  setDisabled,
+  activeThread,
+  setActiveThread,
+  setChatHistory,
+}: ConfirmDeleteProps) => {
+  const handleDelete = async () => {
+    if (activeThread()?.id === thread.id) {
+      setActiveThread(undefined);
+      setChatHistory(null);
+    }
+    setDisabled(true);
+    await deleteThread(thread);
+  };
+
+  return (
+    <>
+      <Dialog open={open()}>
+        <DialogContent>
+          <DialogDescription class="flex flex-col">
+            <div class="flex items-center justify-center">
+              <p>Are you sure you want to delete this chat?</p>
+            </div>
+            <div class="flex flex-row items-center mt-2 justify-center">
+              <Button onClick={handleDelete} class="ml-2">
+                Delete
+              </Button>
+              <Button onClick={() => setOpen(!open())} class="ml-2">
+                Cancel
+              </Button>
+            </div>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
 interface NonEditableItemProps {
   thread: Thread;
   toggleEditable: () => void;
-  setDisabled: (val: boolean) => void;
-  setActiveThread: (val: Thread) => void;
+  disabled: () => boolean;
+  setActiveThread: (val: Thread | undefined) => void;
+  setOpen: (val: boolean) => void;
 }
 
 const NonEditableItem = ({
   thread,
   toggleEditable,
-  setDisabled,
+  disabled,
   setActiveThread,
+  setOpen,
 }: NonEditableItemProps) => {
   const loadHistory = () => {
     setActiveThread(thread);
   };
+
+  const deleteHistory = async () => {
+    if (!disabled()) setOpen(true);
+  };
+  createEffect(async () => {});
+
   return (
     <>
       <div class="flex justify-between w-full">
@@ -95,10 +155,7 @@ const NonEditableItem = ({
             <i class="fa-solid fa-pen-to-square"></i>
           </Button>
           <Button
-            onClick={() => {
-              setDisabled(true);
-              deleteThread(thread);
-            }}
+            onClick={deleteHistory}
             class="flex p-2 hover:text-red-500 bg-transparent hover:bg-transparent"
           >
             <i class="fa-solid fa-trash"></i>
@@ -111,13 +168,21 @@ const NonEditableItem = ({
 
 interface HistoryItemProps {
   thread: Thread;
-  setActiveThread: (val: Thread) => void;
+  activeThread: () => Thread | undefined;
+  setChatHistory: (val: ChatMessage[] | null) => void;
+  setActiveThread: (val: Thread | undefined) => void;
 }
 
-const HistoryItem = ({ thread, setActiveThread }: HistoryItemProps) => {
+const HistoryItem = ({
+  thread,
+  activeThread,
+  setActiveThread,
+  setChatHistory,
+}: HistoryItemProps) => {
   const [editable, setEditable] = createSignal(false);
   const [name, setName] = createSignal(thread.name);
   const [disabled, setDisabled] = createSignal(false);
+  const [open, setOpen] = createSignal(false);
   const toggleEditable = () => setEditable(!editable());
 
   createEffect(() => {
@@ -125,28 +190,40 @@ const HistoryItem = ({ thread, setActiveThread }: HistoryItemProps) => {
   });
 
   return (
-    <Show when={!disabled()} fallback={null}>
-      <div class="flex flex-row justify-between border-solid border-white border rounded">
-        <Show
-          when={!editable()}
-          fallback={
-            <EditableItem
+    <>
+      <Show when={!disabled()} fallback={null}>
+        <div class="flex flex-row justify-between border-solid border-white border rounded">
+          <Show
+            when={!editable()}
+            fallback={
+              <EditableItem
+                thread={thread}
+                name={name() ?? "New Chat"}
+                setName={setName}
+                toggleEditable={toggleEditable}
+              />
+            }
+          >
+            <NonEditableItem
               thread={thread}
-              name={name() ?? "New Chat"}
-              setName={setName}
               toggleEditable={toggleEditable}
+              disabled={disabled}
+              setOpen={setOpen}
+              setActiveThread={setActiveThread}
             />
-          }
-        >
-          <NonEditableItem
-            thread={thread}
-            toggleEditable={toggleEditable}
-            setDisabled={setDisabled}
-            setActiveThread={setActiveThread}
-          />
-        </Show>
-      </div>
-    </Show>
+          </Show>
+        </div>
+      </Show>
+      <ConfirmDelete
+        thread={thread}
+        open={open}
+        setOpen={setOpen}
+        setDisabled={setDisabled}
+        activeThread={activeThread}
+        setChatHistory={setChatHistory}
+        setActiveThread={setActiveThread}
+      />
+    </>
   );
 };
 

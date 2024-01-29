@@ -24,7 +24,6 @@ const App = () => {
       />
       <Sidebar
         activeThread={activeThread}
-        chatHistory={chatHistory}
         isSidebarOpen={isSidebarOpen}
         setSidebarOpen={setSidebarOpen}
         setActiveThread={setActiveThread}

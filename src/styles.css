@@ -108,7 +108,7 @@
   }
 
   pre code.hljs {
-    @apply bg-black rounded max-w-fit;
+    @apply dark:bg-black rounded max-w-fit;
   }
 
   @media (max-width: 640px) {

@@ -11,7 +11,6 @@ interface SidebarProps {
   isSidebarOpen: () => boolean;
   activeThread: () => Thread | undefined;
   setActiveThread: (val: Thread | undefined) => void;
-  chatHistory: () => ChatMessage[] | null;
   setChatHistory: (val: ChatMessage[] | null) => void;
 }
 
@@ -21,7 +20,6 @@ const Sidebar = ({
   activeThread,
   setActiveThread,
   setChatHistory,
-  chatHistory,
 }: SidebarProps) => {
   const [history, setHistory] = createSignal<Thread[] | null>(null);
   const toggleSidebar = () => {
@@ -34,9 +32,8 @@ const Sidebar = ({
   };
 
   createEffect(async () => {
-    if (activeThread() === undefined && chatHistory() === null) {
+    if (!activeThread()) {
       const threads = await listThreads();
-      console.log(threads);
       setHistory(threads);
     }
   });
@@ -82,6 +79,8 @@ const Sidebar = ({
                 return (
                   <HistoryItem
                     thread={message}
+                    activeThread={activeThread}
+                    setChatHistory={setChatHistory}
                     setActiveThread={setActiveThread}
                   />
                 );

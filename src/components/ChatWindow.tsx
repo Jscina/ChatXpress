@@ -47,9 +47,10 @@ const ChatWindow = ({
   activeThread,
 }: ChatWindowProps) => {
   const [assistantLoading, setAssistantLoading] = createSignal<boolean>(false);
+
   createEffect(() => {
     const currentHistory = chatHistory() ?? [];
-    if (currentMessage() !== "") {
+    if (currentMessage() !== "" && !assistantLoading()) {
       setChatHistory([
         ...currentHistory,
         {
@@ -59,17 +60,20 @@ const ChatWindow = ({
       ]);
       setAssistantLoading(true);
       setCurrentMessage("");
-    } else if (assistantResponse() !== "") {
+    } else if (assistantResponse() !== "" && assistantLoading()) {
       setChatHistory([
         ...currentHistory,
-        { role: AIRole.ASSISTANT, content: assistantResponse() },
+        {
+          role: AIRole.ASSISTANT,
+          content: assistantResponse(),
+        },
       ]);
       setAssistantLoading(false);
       setAssistantResponse("");
     }
-    console.log(chatHistory());
   });
 
+  // Fetch chat history for active thread
   createEffect(async () => {
     const thread = activeThread();
     if (thread === undefined) return null;

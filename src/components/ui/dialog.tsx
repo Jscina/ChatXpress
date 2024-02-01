@@ -36,7 +36,7 @@ const DialogOverlay: Component<DialogPrimitive.DialogOverlayProps> = (
   return (
     <DialogPrimitive.Overlay
       class={cn(
-        "bg-background/80 data-[expanded]:animate-in data-[closed]:animate-out data-[closed]:fade-out-0 data-[expanded]:fade-in-0 fixed inset-0 z-50 backdrop-blur-sm",
+        "bg-background/80 dark:bg-black/80 data-[expanded]:animate-in data-[closed]:animate-out data-[closed]:fade-out-0 data-[expanded]:fade-in-0 fixed inset-0 z-50 backdrop-blur-sm",
         props.class,
       )}
       {...rest}

@@ -89,21 +89,30 @@ const ConfirmDelete = ({
     }
     setDisabled(true);
     await deleteThread(thread);
+    setOpen(false);
   };
 
   return (
     <>
       <Dialog open={open()}>
-        <DialogContent>
+        <DialogContent class="dark:bg-dark dark:text-white text-black">
           <DialogDescription class="flex flex-col">
             <div class="flex items-center justify-center">
-              <p>Are you sure you want to delete this chat?</p>
+              <p class="dark:text-white text-black">
+                Are you sure you want to delete this chat?
+              </p>
             </div>
             <div class="flex flex-row items-center mt-2 justify-center">
-              <Button onClick={handleDelete} class="ml-2">
+              <Button
+                onClick={handleDelete}
+                class="rounded border-solid border-2 text-black dark:text-white bg-transparent hover:bg-red-600 dark:hover:bg-red-700 ml-2"
+              >
                 Delete
               </Button>
-              <Button onClick={() => setOpen(!open())} class="ml-2">
+              <Button
+                onClick={() => setOpen(!open())}
+                class="rounded border-solid border-2 text-black dark:text-white bg-transparent hover:bg-gray-400 dark:hover:bg-gray-500 ml-2"
+              >
                 Cancel
               </Button>
             </div>

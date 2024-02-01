@@ -59,7 +59,7 @@ const SettingsMenu = (props: SettingsMenuProps) => {
             class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded"
           />
           <Button
-            class="hover:bg-slate-400 bg-transparent border-solid border-2 shadow p-3 rounded"
+            class="hover:bg-slate-400  text-black dark:text-white bg-transparent border-solid border-2 shadow p-3 rounded"
             onClick={() => {
               setApiKeyReveal(!apiKeyReveal());
             }}

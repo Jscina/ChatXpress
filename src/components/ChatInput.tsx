@@ -1,4 +1,4 @@
-import { createSignal, createEffect } from "solid-js";
+import { createSignal, onMount, createEffect } from "solid-js";
 
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
@@ -33,7 +33,10 @@ const ChatInput = ({
     const promptInput = messageInput();
     const textArea = messageRef();
 
-    if (textArea) textArea.value = "";
+    if (textArea) {
+      textArea.value = "";
+      setMessageInput("");
+    }
     if (promptInput !== "") setCurrentMessage(promptInput);
 
     const assistant = activeAssistant();
@@ -51,16 +54,24 @@ const ChatInput = ({
     }
   };
 
+  const setContainerHeight = (height: string) => {
+    messageRef()?.style.setProperty("height", height);
+  };
+
   const handleInput = (e: any) => {
     setMessageInput(e.currentTarget.value);
 
     const scrollHeight = e.target.scrollHeight;
-    if (messageInput()) {
-      messageRef()?.style.setProperty("height", scrollHeight + "px");
-    } else {
-      messageRef()?.style.setProperty("height", "auto");
+    if (messageInput() !== "") {
+      setContainerHeight(scrollHeight + "px");
     }
   };
+
+  createEffect(() => {
+    if (messageInput() === "") {
+      setContainerHeight("auto");
+    }
+  });
 
   createEffect(() => {
     if (activeAssistant() === undefined) {

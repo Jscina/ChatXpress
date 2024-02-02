@@ -95,7 +95,7 @@ const ConfirmDelete = ({
   return (
     <>
       <Dialog open={open()}>
-        <DialogContent class="dark:bg-dark dark:text-white text-black">
+        <DialogContent class="border-none dark:bg-dark dark:text-white text-black">
           <DialogDescription class="flex flex-col">
             <div class="flex items-center justify-center">
               <p class="dark:text-white text-black">

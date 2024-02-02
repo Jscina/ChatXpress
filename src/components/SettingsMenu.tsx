@@ -1,4 +1,4 @@
-import { createSignal, onMount } from "solid-js";
+import { createSignal } from "solid-js";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
@@ -8,7 +8,8 @@ import {
   DialogContent,
   DialogDescription,
 } from "./ui/dialog";
-import { readApiKey, writeApiKey } from "../api/assistant";
+
+import { writeApiKey } from "../api/assistant";
 
 interface MenuItemProps {
   name: string;
@@ -27,15 +28,13 @@ const SettingsItem = ({ name, children }: MenuItemProps) => {
 interface SettingsMenuProps {
   open: () => boolean;
   setOpen: (val: boolean) => void;
+  setApiKey: (val: string) => void;
+  apiKey: () => string;
 }
 
 const SettingsMenu = (props: SettingsMenuProps) => {
   const [apiKeyReveal, setApiKeyReveal] = createSignal(false);
-  const [apiKey, setApiKey] = createSignal("");
 
-  onMount(async () => {
-    setApiKey(await readApiKey());
-  });
   return (
     <>
       <Dialog open={props.open()}>
@@ -55,12 +54,12 @@ const SettingsMenu = (props: SettingsMenuProps) => {
             <SettingsItem name="Api Key">
               <Input
                 onChange={async (e) => {
-                  setApiKey(e.currentTarget.value);
-                  await writeApiKey(apiKey());
+                  props.setApiKey(e.currentTarget.value);
+                  await writeApiKey(props.apiKey());
                 }}
                 type={!apiKeyReveal() ? "password" : "text"}
                 placeholder="Enter API Key..."
-                value={apiKey()}
+                value={props.apiKey()}
                 class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded"
               />
               <Button

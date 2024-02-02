@@ -12,6 +12,8 @@ interface SidebarProps {
   activeThread: () => Thread | undefined;
   setActiveThread: (val: Thread | undefined) => void;
   setChatHistory: (val: ChatMessage[] | null) => void;
+  setApiKey: (val: string) => void;
+  apiKey: () => string;
 }
 
 const Sidebar = ({
@@ -20,6 +22,8 @@ const Sidebar = ({
   activeThread,
   setActiveThread,
   setChatHistory,
+  setApiKey,
+  apiKey,
 }: SidebarProps) => {
   const [history, setHistory] = createSignal<Thread[] | null>(null);
   const toggleSidebar = () => {
@@ -91,7 +95,7 @@ const Sidebar = ({
         <div class="flex-none">
           <hr />
           <div class="flex flex-col space-y-2 p-4 mb-auto">
-            <UserProfile />
+            <UserProfile apiKey={apiKey} setApiKey={setApiKey} />
           </div>
         </div>
       </nav>

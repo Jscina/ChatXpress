@@ -1,4 +1,4 @@
-import { createSignal, onMount, createEffect } from "solid-js";
+import { createSignal, createEffect } from "solid-js";
 
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";

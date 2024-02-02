@@ -1,9 +1,11 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import clsx from "clsx";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
+import { Alert, AlertTitle, AlertDescription } from "./components/ui/alert";
+import { readApiKey } from "./api/assistant";
 import type { Assistant, Thread, ChatMessage } from "./types";
 
 const App = () => {
@@ -15,6 +17,17 @@ const App = () => {
   const [chatHistory, setChatHistory] = createSignal<ChatMessage[] | null>(
     null,
   );
+  const [apiKey, setApiKey] = createSignal<string>("");
+
+  onMount(async () => {
+    try {
+      setApiKey(await readApiKey());
+    } catch (e) {
+      console.error(e);
+      setApiKey("");
+    }
+  });
+
   return (
     <>
       <Header
@@ -28,6 +41,8 @@ const App = () => {
         setSidebarOpen={setSidebarOpen}
         setActiveThread={setActiveThread}
         setChatHistory={setChatHistory}
+        apiKey={apiKey}
+        setApiKey={setApiKey}
       />
       <main
         class={clsx(
@@ -58,6 +73,16 @@ const App = () => {
             activeThread={activeThread}
           />
         </div>
+        <Show when={!apiKey()}>
+          <div class="fixed inset-0 flex  items-center justify-center z-50">
+            <Alert class="max-w-[50%]">
+              <AlertTitle class="text-2xl">API Key Required</AlertTitle>
+              <AlertDescription>
+                Please enter your API key in the settings menu to continue.
+              </AlertDescription>
+            </Alert>
+          </div>
+        </Show>
       </main>
     </>
   );

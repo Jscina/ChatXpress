@@ -14,10 +14,6 @@ export async function writeApiKey(apiKey: string): Promise<void> {
   return await invoke("write_api_key", { api_key: apiKey });
 }
 
-export async function createThread(): Promise<Thread> {
-  return await invoke("create_thread");
-}
-
 export async function deleateThread(thread: Thread): Promise<void> {
   return await invoke("delete_thread", thread);
 }

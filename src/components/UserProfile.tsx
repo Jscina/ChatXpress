@@ -21,7 +21,12 @@ const MenuItem = ({ name, onClick, children }: MenuItemProps) => (
   </li>
 );
 
-const UserProfile = () => {
+interface UserProfileProps {
+  apiKey: () => string;
+  setApiKey: (val: string) => void;
+}
+
+const UserProfile = ({ apiKey, setApiKey }: UserProfileProps) => {
   const [showMenu, setShowMenu] = createSignal(false);
   const [darkMode, setDarkMode] = createSignal(false);
   const [displayName, setDisplayName] = createSignal("");
@@ -91,7 +96,12 @@ const UserProfile = () => {
           </ul>
         </div>
       </Show>
-      <SettingsMenu open={open} setOpen={setOpen} />
+      <SettingsMenu
+        open={open}
+        setOpen={setOpen}
+        apiKey={apiKey}
+        setApiKey={setApiKey}
+      />
     </>
   );
 };

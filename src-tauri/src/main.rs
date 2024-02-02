@@ -23,7 +23,6 @@ fn main() {
             conversation,
             get_history,
             list_assistants,
-            create_thread,
             delete_thread,
             history_read,
             history_create,

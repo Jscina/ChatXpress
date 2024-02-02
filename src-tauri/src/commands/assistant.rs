@@ -4,7 +4,6 @@ use crate::{
 };
 
 use async_openai::types::{MessageContent, MessageRole};
-use dotenv::dotenv;
 use std::collections::HashMap;
 use tokio::fs;
 
@@ -20,20 +19,6 @@ pub async fn delete_thread(
     let res = bot.delete_thread(&thread.id).await;
     match res {
         Ok(_) => Ok(()),
-        Err(e) => Err(e.to_string()),
-    }
-}
-
-#[tauri::command(async, rename_all = "snake_case")]
-pub async fn create_thread(state: tauri::State<'_, BotState>) -> Result<Thread, String> {
-    let bot = {
-        let state_guard = state.0.lock().unwrap();
-        state_guard.bot.clone()
-    };
-    let thread = bot.create_thread().await;
-
-    match thread {
-        Ok(thread) => Ok(Thread::new(thread.id, None, None)),
         Err(e) => Err(e.to_string()),
     }
 }
@@ -128,7 +113,7 @@ pub async fn list_assistants(state: tauri::State<'_, BotState>) -> Result<Vec<As
     let res = bot
         .list_assistants()
         .await
-        .unwrap()
+        .map_err(|e| e.to_string())?
         .iter()
         .map(|x| {
             Assistant::new(
@@ -155,10 +140,14 @@ pub async fn read_api_key() -> Result<String, String> {
 
 #[tauri::command(async, rename_all = "snake_case")]
 pub async fn write_api_key(api_key: String) -> Result<(), String> {
-    let res = fs::write(".env", format!("OPENAI_API_KEY = {api_key}")).await;
+    let res = fs::write(
+        "../.env",
+        format!("DATABASE_URL = sqlite://chatxpress.db\nOPENAI_API_KEY = {api_key}"),
+    )
+    .await;
     match res {
         Ok(_) => {
-            dotenv().ok();
+            std::env::set_var("OPENAI_API_KEY", api_key);
             Ok(())
         }
         Err(e) => Err(e.to_string()),

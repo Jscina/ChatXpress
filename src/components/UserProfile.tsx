@@ -25,16 +25,12 @@ const UserProfile = () => {
   const [showMenu, setShowMenu] = createSignal(false);
   const [darkMode, setDarkMode] = createSignal(false);
   const [displayName, setDisplayName] = createSignal("");
-  const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement>();
   const [menuRef, setMenuRef] = createSignal<HTMLDivElement>();
+  const [open, setOpen] = createSignal(false);
 
   const openSettings = () => {
     setShowMenu(false);
-    dialogRef()?.showModal();
-  };
-
-  const closeSettings = () => {
-    dialogRef()?.close();
+    setOpen(true);
   };
 
   const toggleDarkMode = () => {
@@ -95,11 +91,7 @@ const UserProfile = () => {
           </ul>
         </div>
       </Show>
-      <SettingsMenu
-        dialogRef={dialogRef}
-        setDialogRef={setDialogRef}
-        closeSettings={closeSettings}
-      />
+      <SettingsMenu open={open} setOpen={setOpen} />
     </>
   );
 };

@@ -23,8 +23,8 @@ const App = () => {
     try {
       setApiKey(await readApiKey());
     } catch (e) {
-      console.error(e);
       setApiKey("");
+      console.error(e);
     }
   });
 
@@ -34,6 +34,7 @@ const App = () => {
         isSidebarOpen={isSidebarOpen}
         setSidebarOpen={setSidebarOpen}
         setActiveAssistant={setActiveAssistant}
+        apiKey={apiKey}
       />
       <Sidebar
         activeThread={activeThread}

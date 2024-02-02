@@ -10,8 +10,8 @@ export async function readApiKey(): Promise<string> {
   return await invoke("read_api_key");
 }
 
-export async function writeApiKey(apiKey: string): Promise<void> {
-  return await invoke("write_api_key", { api_key: apiKey });
+export async function updateApiKey(apiKey: string): Promise<void> {
+  return await invoke("update_api_key", { api_key: apiKey });
 }
 
 export async function deleateThread(thread: Thread): Promise<void> {

@@ -16,12 +16,14 @@ interface HeaderProps {
   setActiveAssistant: (assistant: Assistant) => void;
   setSidebarOpen: (val: boolean) => void;
   isSidebarOpen: () => boolean;
+  apiKey: () => string;
 }
 
 const Header = ({
   setSidebarOpen,
   isSidebarOpen,
   setActiveAssistant,
+  apiKey,
 }: HeaderProps) => {
   const [selectedAssistant, setSelectedAssistant] = createSignal<string>("");
   const [assistants, setAssistants] = createSignal<string[]>([]);
@@ -32,6 +34,8 @@ const Header = ({
     setSidebarOpen(!isSidebarOpen());
   };
 
+  let delay = 0;
+
   createEffect(() => {
     if (selectedAssistant() === "") return;
     const available = availableAssistants();
@@ -41,10 +45,32 @@ const Header = ({
     )!;
     setActiveAssistant(assistant);
   });
-  onMount(async () => {
-    const assistants = await listAssistants();
-    setAvailableAssistants(assistants);
-    setAssistants(assistants.map((assistant) => assistant.name));
+
+  const fetchAssistants = async () => {
+    try {
+      const assistants = await listAssistants();
+      setAvailableAssistants(assistants);
+      setAssistants(assistants.map((assistant) => assistant.name));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  createEffect(async () => {
+    if (apiKey() === "") {
+      setAssistants([]);
+    } else {
+      // There's a delay in the API key being set
+      // so we need to wait for it to be set before
+      // trying to fetch the assistants
+      setTimeout(async () => {
+        await fetchAssistants();
+      }, delay);
+    }
+  });
+
+  onMount(() => {
+    delay = 500;
   });
 
   return (

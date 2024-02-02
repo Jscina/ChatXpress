@@ -1,5 +1,24 @@
 use crate::{models::HistoryEntry, Database};
-use sqlx::Error;
+use sqlx::{Error, Row};
+
+pub async fn read_api_key(db: &Database) -> Result<String, Error> {
+    let query = include_str!("./sql/api_key/read.sql");
+    let result = sqlx::query(query).fetch_one(&db.pool).await?;
+
+    Ok(result.get(0))
+}
+
+pub async fn write_api_key(db: &Database, api_key: &str) -> Result<(), Error> {
+    let query = include_str!("./sql/api_key/create.sql");
+    sqlx::query(query).bind(api_key).execute(&db.pool).await?;
+    Ok(())
+}
+
+pub async fn update_api_key(db: &Database, api_key: &str) -> Result<(), Error> {
+    let query = include_str!("./sql/api_key/update.sql");
+    sqlx::query(query).bind(api_key).execute(&db.pool).await?;
+    Ok(())
+}
 
 /// Read all threads from the database.
 pub async fn history_read(db: &Database) -> Result<Vec<HistoryEntry>, Error> {

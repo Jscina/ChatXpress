@@ -1,13 +1,16 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-extern crate chatxpress;
-use chatxpress::{assistant::*, history_crud::*, BotState, Database, State};
-use dotenv::dotenv;
-use std::sync::{Arc, Mutex};
+// Prevents additional console window on Windows in release, DO NOT REMOVE!! #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] extern crate chatxpress;
+use chatxpress::{api_key_crud::*, assistant::*, history_crud::*, BotState, Database, State};
+
+use std::{
+    env,
+    sync::{Arc, Mutex},
+};
 use tokio::runtime::Runtime;
 
+const DATABASE_URL: &str = "sqlite:chatxpress.db";
+
 fn main() {
-    dotenv().ok();
+    env::set_var("DATABASE_URL", DATABASE_URL);
     tauri::Builder::default()
         .setup(|_app| {
             let rt = Runtime::new().unwrap();
@@ -29,7 +32,7 @@ fn main() {
             history_update,
             history_delete,
             read_api_key,
-            write_api_key,
+            update_api_key,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,0 +1,1 @@
+UPDATE API_KEY SET key = ? WHERE id = 1;

@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from "./ui/dialog";
 
-import { writeApiKey } from "../api/assistant";
+import { updateApiKey } from "../api/assistant";
 
 interface MenuItemProps {
   name: string;
@@ -55,7 +55,7 @@ const SettingsMenu = (props: SettingsMenuProps) => {
               <Input
                 onChange={async (e) => {
                   props.setApiKey(e.currentTarget.value);
-                  await writeApiKey(props.apiKey());
+                  await updateApiKey(props.apiKey());
                 }}
                 type={!apiKeyReveal() ? "password" : "text"}
                 placeholder="Enter API Key..."

@@ -4,6 +4,7 @@ mod openai_tools {
 }
 
 mod commands {
+    pub mod api_key_crud;
     pub mod assistant;
     pub mod history_crud;
     pub mod schemas;

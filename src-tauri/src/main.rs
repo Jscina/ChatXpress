@@ -1,21 +1,22 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!! #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] extern crate chatxpress;
-use chatxpress::{api_key_crud::*, assistant::*, history_crud::*, BotState, Database, State};
-
+// Prevents additional console window on Windows in release, DO NOT REMOVE!!
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+extern crate chatxpress;
+use chatxpress::{
+    api_key_crud::*, assistant::*, history_crud::*, BotState, Database, State, DATABASE_URL,
+};
 use std::{
     env,
     sync::{Arc, Mutex},
 };
 use tokio::runtime::Runtime;
 
-const DATABASE_URL: &str = "sqlite:chatxpress.db";
-
 fn main() {
-    env::set_var("DATABASE_URL", DATABASE_URL);
+    env::set_var("DATABASE_URL", &*DATABASE_URL);
     tauri::Builder::default()
         .setup(|_app| {
             let rt = Runtime::new().unwrap();
             rt.block_on(async {
-                let db = Database::new().await;
+                let db = Database::new(&DATABASE_URL).await;
                 db.init().await.expect("error initializing database");
                 db.pool.close().await;
             });

@@ -1,3 +1,4 @@
+use crate::APP_DATA_DIR;
 use sqlx::SqlitePool;
 use tokio::fs;
 
@@ -7,16 +8,23 @@ pub struct Database {
 }
 
 impl Database {
-    pub async fn new() -> Database {
-        let pool = SqlitePool::connect("sqlite:chatxpress.db").await;
-        Database {
-            pool: match pool {
-                Ok(pool) => pool,
-                Err(_) => {
-                    fs::write("chatxpress.db", "").await.unwrap();
-                    SqlitePool::connect("sqlite:chatxpress.db").await.unwrap()
-                }
-            },
+    pub async fn new(database_url: &str) -> Database {
+        let db_path = APP_DATA_DIR.join("ChatXPress").join("chatxpress.db");
+
+        if let Some(parent) = db_path.parent() {
+            if !parent.exists() {
+                fs::create_dir_all(&parent).await.unwrap();
+            }
+        }
+
+        if !db_path.exists() {
+            fs::write(&db_path, "").await.unwrap();
+        }
+
+        let pool = SqlitePool::connect(database_url).await;
+        match pool {
+            Ok(p) => Database { pool: p },
+            Err(e) => panic!("Error creating database pool: {}", e),
         }
     }
 

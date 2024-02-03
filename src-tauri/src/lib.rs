@@ -21,7 +21,29 @@ pub use db_services::crud;
 pub use db_services::database::Database;
 pub use db_services::models;
 pub use openai_tools::ChatBot;
-use std::sync::{Arc, Mutex};
+
+#[macro_use]
+extern crate lazy_static;
+use std::{
+    path::PathBuf,
+    sync::{Arc, Mutex},
+};
+use tauri::{api::path, Config};
+
+lazy_static! {
+    pub static ref APP_DATA_DIR: PathBuf =
+        path::app_data_dir(&Config::default()).expect("Cannot get app data dir");
+    pub static ref DATABASE_URL: String = {
+        format!(
+            "sqlite:///{}",
+            APP_DATA_DIR
+                .join("ChatXPress")
+                .join("chatxpress.db")
+                .to_str()
+                .expect("Path to string conversion failed"),
+        )
+    };
+}
 
 pub struct State {
     pub bot: ChatBot,
@@ -34,7 +56,7 @@ impl Default for State {
             bot: ChatBot::default(),
             db: {
                 let rt = tokio::runtime::Runtime::new().unwrap();
-                rt.block_on(Database::new())
+                rt.block_on(Database::new(&DATABASE_URL))
             },
         }
     }

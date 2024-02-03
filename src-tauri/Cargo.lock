@@ -397,6 +397,7 @@ name = "chatxpress"
 version = "0.0.1"
 dependencies = [
  "async-openai",
+ "lazy_static",
  "serde",
  "serde_json",
  "sqlx",

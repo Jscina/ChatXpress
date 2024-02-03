@@ -29,18 +29,11 @@ Install Tauri Cli
 ```bash
   cargo install tauri-cli
 ```
-[Install Node](https://nodejs.org/en/download) or [Install Bun](https://bun.sh/docs/installation)
-
-NOTE - If you don't install bun you'll need to edit the before build command in [tauri.conf.json](./src-tauri/tauri.conf.json)
+[Install Node](https://nodejs.org/en/download)
 
 Install node dependencies
 ```bash
   npm install
-```
-Or
-
-```bash
-  bun install
 ```
 
 Build Project

@@ -39,8 +39,15 @@ jobs:
           node-version: 'lts/*'
           cache: 'npm'
 
+      - name: Install Tauri CLI for macOS
+        if: matrix.platform == 'macos-latest'
+        run: npm install @tauri-apps/cli-darwin-x64
+
+      - name: Install Tauri CLI for Windows
+        if: matrix.platform == 'windows-latest'
+        run: npm install @tauri-apps/cli-win32-x64-msvc
+
       - name: Install frontend dependencies
-        # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
         run: npm install
 
       - name: Build the app
@@ -50,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }} # This only works if your workflow triggers on new tags.
-          releaseName: 'ChatXPress v__VERSION__' # tauri-action replaces \_\_VERSION\_\_ with the app version.
+          releaseName: 'ChatXPress v__VERSION__' # tauri-action replaces __VERSION__ with the app version.
           releaseBody: 'See the assets to download and install this version.'
           releaseDraft: true
           prerelease: false

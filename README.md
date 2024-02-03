@@ -56,7 +56,7 @@ An installer will be available eventually.
 
 ### Linux Users:
 
-A package will be available eventually.
+An AppImage and a .deb can be found on the releases page
 
 ### OSX Users:
 

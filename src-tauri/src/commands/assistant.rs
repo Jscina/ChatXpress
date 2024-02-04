@@ -112,6 +112,7 @@ pub async fn conversation(
     }
 }
 
+/// Sets the API key for the bot from the database
 #[tauri::command(async, rename_all = "snake_case")]
 pub async fn set_api_key(state: tauri::State<'_, BotState>) -> Result<(), String> {
     let mut bot = {
@@ -123,6 +124,7 @@ pub async fn set_api_key(state: tauri::State<'_, BotState>) -> Result<(), String
     match api_key {
         Ok(key) => {
             bot.set_api_key(&key);
+            // Need to mutate the state to set the bot with the api key
             state.0.lock().unwrap().bot = bot.clone();
             Ok(())
         }

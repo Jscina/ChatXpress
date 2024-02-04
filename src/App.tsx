@@ -5,7 +5,7 @@ import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
 import { Alert, AlertTitle, AlertDescription } from "./components/ui/alert";
-import { readApiKey } from "./api/assistant";
+import { readApiKey, setOpenAIApiKey } from "./api/assistant";
 import type { Assistant, Thread, ChatMessage } from "./types";
 
 const App = () => {
@@ -22,6 +22,7 @@ const App = () => {
   onMount(async () => {
     try {
       setApiKey(await readApiKey());
+      await setOpenAIApiKey();
     } catch (e) {
       setApiKey("");
       console.error(e);

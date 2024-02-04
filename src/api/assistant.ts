@@ -2,6 +2,18 @@ import { invoke } from "@tauri-apps/api/tauri";
 import type { Assistant, Thread, Chat, ChatMessage } from "../types";
 type AssistantResponse = [string, Thread];
 
+export async function countTokens(text: string): Promise<number> {
+  return await invoke("count_tokens", { text: text });
+}
+
+export async function setOpenAIApiKey(): Promise<void> {
+  try {
+    await invoke("set_api_key");
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 export async function listAssistants(): Promise<Assistant[]> {
   return await invoke("list_assistants");
 }
@@ -24,15 +36,19 @@ export async function conversation(
   thread?: Thread,
 ): Promise<Chat> {
   if (prompt === "") return { content: "", thread: thread } as Chat;
-  const response: AssistantResponse = await invoke("conversation", {
-    prompt: prompt,
-    assistant_id: assistant.id,
-    thread: thread,
-  });
-  return {
-    content: response[0],
-    thread: response[1],
-  } as Chat;
+  try {
+    const response: AssistantResponse = await invoke("conversation", {
+      prompt: prompt,
+      assistant_id: assistant.id,
+      thread: thread,
+    });
+    return {
+      content: response[0],
+      thread: response[1],
+    } as Chat;
+  } catch (e) {
+    return { content: e, thread: thread } as Chat;
+  }
 }
 
 export async function getHistory(thread: Thread): Promise<ChatMessage[]> {

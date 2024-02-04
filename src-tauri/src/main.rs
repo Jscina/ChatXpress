@@ -4,14 +4,10 @@ extern crate chatxpress;
 use chatxpress::{
     api_key_crud::*, assistant::*, history_crud::*, BotState, Database, State, DATABASE_URL,
 };
-use std::{
-    env,
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 use tokio::runtime::Runtime;
 
 fn main() {
-    env::set_var("DATABASE_URL", &*DATABASE_URL);
     tauri::Builder::default()
         .setup(|_app| {
             let rt = Runtime::new().unwrap();
@@ -34,6 +30,8 @@ fn main() {
             history_delete,
             read_api_key,
             update_api_key,
+            count_tokens,
+            set_api_key,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

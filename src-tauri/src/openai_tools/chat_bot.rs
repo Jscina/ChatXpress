@@ -8,8 +8,6 @@ use async_openai::{
     Client,
 };
 
-use std::env;
-
 #[derive(Clone)]
 pub struct ChatBot {
     pub client: Client<OpenAIConfig>,
@@ -25,13 +23,12 @@ impl Default for ChatBot {
     }
 }
 impl ChatBot {
-    pub async fn list_assistants(&mut self) -> Result<Vec<AssistantObject>, OpenAIError> {
-        let api_key = env::var("OPENAI_API_KEY");
-        if let Ok(key) = api_key {
-            let config = self.client.config().clone().with_api_key(key);
-            self.client = Client::with_config(config);
-        }
+    pub fn set_api_key(&mut self, key: &str) {
+        let config = self.client.config().clone().with_api_key(key);
+        self.client = Client::with_config(config);
+    }
 
+    pub async fn list_assistants(&self) -> Result<Vec<AssistantObject>, OpenAIError> {
         let query = [("limt", "10")];
         let assistants = self.client.assistants().list(&query).await?;
         Ok(assistants.data)

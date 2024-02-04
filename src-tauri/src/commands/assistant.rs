@@ -5,7 +5,15 @@ use crate::{
 };
 
 use async_openai::types::{MessageContent, MessageRole};
-use std::{collections::HashMap, env};
+use std::collections::HashMap;
+use tiktoken_rs::cl100k_base;
+
+#[tauri::command(async, rename_all = "snake_case")]
+pub async fn count_tokens(text: String) -> usize {
+    let bpe = cl100k_base().unwrap();
+    let tokens = bpe.encode_with_special_tokens(&text);
+    tokens.len()
+}
 
 #[tauri::command(async, rename_all = "snake_case")]
 pub async fn delete_thread(
@@ -105,15 +113,29 @@ pub async fn conversation(
 }
 
 #[tauri::command(async, rename_all = "snake_case")]
-pub async fn list_assistants(state: tauri::State<'_, BotState>) -> Result<Vec<Assistant>, String> {
+pub async fn set_api_key(state: tauri::State<'_, BotState>) -> Result<(), String> {
     let mut bot = {
         let state_guard = state.0.lock().unwrap();
         state_guard.bot.clone()
     };
     let db = state.0.lock().unwrap().db.clone();
+    let api_key = read_api_key(&db).await;
+    match api_key {
+        Ok(key) => {
+            bot.set_api_key(&key);
+            state.0.lock().unwrap().bot = bot.clone();
+            Ok(())
+        }
+        Err(e) => Err(e.to_string()),
+    }
+}
 
-    let api = read_api_key(&db).await.unwrap();
-    env::set_var("OPENAI_API_KEY", api);
+#[tauri::command(async, rename_all = "snake_case")]
+pub async fn list_assistants(state: tauri::State<'_, BotState>) -> Result<Vec<Assistant>, String> {
+    let bot = {
+        let state_guard = state.0.lock().unwrap();
+        state_guard.bot.clone()
+    };
 
     let res = bot
         .list_assistants()

@@ -36,3 +36,10 @@ export type HistoryEntry = {
   thread_name: string;
   created_at: string;
 };
+
+export type ModelPricing = {
+  model: {
+    input: number;
+    output: number;
+  };
+};

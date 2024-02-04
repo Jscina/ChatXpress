@@ -1,6 +1,8 @@
 mod openai_tools {
     pub mod chat_bot;
     pub use chat_bot::ChatBot;
+    pub mod oai_scraper;
+    pub use oai_scraper::{run_scraper, ModelPricing};
 }
 
 mod commands {
@@ -20,7 +22,7 @@ pub use commands::*;
 pub use db_services::crud;
 pub use db_services::database::Database;
 pub use db_services::models;
-pub use openai_tools::ChatBot;
+pub use openai_tools::*;
 
 #[macro_use]
 extern crate lazy_static;

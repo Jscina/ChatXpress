@@ -5,7 +5,7 @@ import Sidebar from "./components/Sidebar";
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
 import { Alert, AlertTitle, AlertDescription } from "./components/ui/alert";
-import { readApiKey, setOpenAIApiKey } from "./api/assistant";
+import { readApiKey, setOpenAIApiKey, getModelPricing } from "./api/assistant";
 import type { Assistant, Thread, ChatMessage } from "./types";
 
 const App = () => {
@@ -20,6 +20,7 @@ const App = () => {
   const [apiKey, setApiKey] = createSignal<string>("");
 
   onMount(async () => {
+    console.log(await getModelPricing());
     try {
       setApiKey(await readApiKey());
       await setOpenAIApiKey();

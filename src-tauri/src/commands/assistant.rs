@@ -1,12 +1,18 @@
 use crate::{
     crud::read_api_key,
+    run_scraper,
     schemas::{Assistant, Thread},
-    BotState,
+    BotState, ModelPricing,
 };
 
 use async_openai::types::{MessageContent, MessageRole};
 use std::collections::HashMap;
 use tiktoken_rs::cl100k_base;
+
+#[tauri::command(async, rename_all = "snake_case")]
+pub async fn get_model_pricing() -> HashMap<String, ModelPricing> {
+    run_scraper()
+}
 
 #[tauri::command(async, rename_all = "snake_case")]
 pub async fn count_tokens(text: String) -> usize {

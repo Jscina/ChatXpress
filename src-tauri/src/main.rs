@@ -32,6 +32,7 @@ fn main() {
             update_api_key,
             count_tokens,
             set_api_key,
+            get_model_pricing
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

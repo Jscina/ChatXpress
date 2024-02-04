@@ -1,16 +1,54 @@
 import { invoke } from "@tauri-apps/api/tauri";
-import type { Assistant, Thread, Chat, ChatMessage } from "../types";
+import type {
+  Assistant,
+  Thread,
+  Chat,
+  ModelPricing,
+  ChatMessage,
+} from "../types";
 type AssistantResponse = [string, Thread];
 
 export async function countTokens(text: string): Promise<number> {
   return await invoke("count_tokens", { text: text });
 }
-
 export async function setOpenAIApiKey(): Promise<void> {
   try {
     await invoke("set_api_key");
   } catch (e) {
     console.error(e);
+  }
+}
+
+/**
+ *  Calls the python webscraper to get the latest model pricing
+ *  Don't repeatedly call this function, to avoid getting ip banned
+ *  Once a week or so should be fine
+ */
+export async function getModelPricing(): Promise<ModelPricing | null> {
+  const localDate = localStorage.getItem("lastPricingCheck");
+  const localPricing = localStorage.getItem("modelPricing");
+  if (localDate && localPricing) {
+    const lastCheck = new Date(localDate);
+    const now = new Date();
+    const diff = now.getTime() - lastCheck.getTime();
+    const days = diff / (1000 * 3600 * 24);
+    if (days < 7) {
+      try {
+        const pricing: ModelPricing = JSON.parse(localPricing);
+        return pricing;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+  try {
+    const pricing: ModelPricing = await invoke("get_model_pricing");
+    localStorage.setItem("lastPricingCheck", new Date().toString());
+    localStorage.setItem("modelPricing", JSON.stringify(pricing));
+    return pricing;
+  } catch (e) {
+    console.error(e);
+    return null;
   }
 }
 

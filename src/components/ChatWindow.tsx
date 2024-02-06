@@ -1,7 +1,8 @@
 import { createSignal, createEffect, Index, Show } from "solid-js";
 import AssistantMessage from "./AssistantMessage";
 import UserMessage from "./UserMessage";
-import { getHistory } from "../api/assistant";
+import Spinner from "./Spinner";
+import { getHistory, getModelPricing, countTokens } from "../api/assistant";
 import {
   AIRole,
   type ChatMessage,
@@ -47,29 +48,78 @@ const ChatWindow = ({
   activeThread,
 }: ChatWindowProps) => {
   const [assistantLoading, setAssistantLoading] = createSignal<boolean>(false);
+  const [chatCost, setChatCost] = createSignal<number>(0);
 
-  createEffect(() => {
+  const calculateTokens = async (
+    history: ChatMessage[],
+  ): Promise<ChatMessage[]> => {
+    setChatCost(0);
+    for (let i = 0; i < history.length; i++) {
+      if (history[i].tokens !== undefined) continue;
+      history[i].tokens = await countTokens(history[i].content);
+    }
+    return history;
+  };
+
+  const calculateCost = async (history: ChatMessage[]) => {
+    const assistant = activeAssistant();
+    if (assistant === undefined) return;
+    const model = assistant.model;
+    const pricing = await getModelPricing();
+    if (!pricing) return;
+    const cost = pricing[model];
+    let inputCost = 0;
+    let outputCost = 0;
+    history.forEach((message) => {
+      switch (message.role) {
+        case AIRole.USER:
+          console.log(message.tokens);
+          if (message.tokens === undefined) return;
+          inputCost += (message.tokens / 1000) * cost.input;
+          break;
+        case AIRole.ASSISTANT:
+          console.log(message.tokens);
+          if (message.tokens === undefined) return;
+          outputCost += (message.tokens / 1000) * cost.output;
+          break;
+      }
+    });
+    const total = inputCost + outputCost;
+    setChatCost(total);
+    setChatHistory(history);
+  };
+
+  createEffect(async () => {
     const currentHistory = chatHistory() ?? [];
-    if (currentMessage() !== "" && !assistantLoading()) {
+    const userMessage = currentMessage();
+    const assistantMessage = assistantResponse();
+    if (userMessage !== "" && !assistantLoading()) {
       setChatHistory([
         ...currentHistory,
         {
           role: AIRole.USER,
-          content: currentMessage(),
+          content: userMessage,
         },
       ]);
+
       setAssistantLoading(true);
       setCurrentMessage("");
-    } else if (assistantResponse() !== "" && assistantLoading()) {
+    } else if (assistantMessage !== "" && assistantLoading()) {
       setChatHistory([
         ...currentHistory,
         {
           role: AIRole.ASSISTANT,
-          content: assistantResponse(),
+          content: assistantMessage,
         },
       ]);
+
       setAssistantLoading(false);
       setAssistantResponse("");
+    }
+    if (currentHistory !== chatHistory()) {
+      let history = chatHistory();
+      history = await calculateTokens(history ?? []);
+      await calculateCost(history);
     }
   });
 
@@ -77,12 +127,22 @@ const ChatWindow = ({
   createEffect(async () => {
     const thread = activeThread();
     if (thread === undefined) return null;
-    const history = await getHistory(thread);
-    setChatHistory(history.reverse());
+    let history = await getHistory(thread);
+    history = history.reverse();
+    setChatHistory(history);
+    history = await calculateTokens(history);
+    await calculateCost(history);
   });
 
   return (
     <>
+      <Show when={chatCost() > 0}>
+        <div class="flex justify-end p-4">
+          <p class="border-solid border-2 border-green-300 bg-green-100 p-4 rounded dark:text-black">
+            Chat Cost: ${chatCost()}
+          </p>
+        </div>
+      </Show>
       <div class="flex-grow overflow-auto max-h-[calc(100vh-14rem)] w-full h-full">
         <div class="flex">
           <div class="space-y-4 overflow-y-scroll overflow-x-hidden flex-grow shadowflex flex-col shadow-lg rounded-lg transition-all duration-300 ease-in-out max-h-45">
@@ -95,16 +155,26 @@ const ChatWindow = ({
                   {(entry) => {
                     switch (entry().role) {
                       case AIRole.USER:
-                        return <UserMessage message={entry().content} />;
+                        return (
+                          <UserMessage
+                            message={entry().content}
+                            tokens={entry().tokens}
+                          />
+                        );
                       case AIRole.ASSISTANT:
-                        return <AssistantMessage message={entry().content} />;
+                        return (
+                          <AssistantMessage
+                            message={entry().content}
+                            tokens={entry().tokens}
+                          />
+                        );
                     }
                   }}
                 </Index>
                 <Show when={assistantLoading()}>
                   <div class="flex justify-center p-4">
                     <div class="flex justify-center items-center">
-                      <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-500"></div>
+                      <Spinner />
                     </div>
                   </div>
                 </Show>

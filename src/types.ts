@@ -8,6 +8,7 @@ export enum AIRole {
 export type ChatMessage = {
   role: AIRole;
   content: string;
+  tokens?: number;
 };
 
 export type Assistant = {
@@ -37,8 +38,13 @@ export type HistoryEntry = {
   created_at: string;
 };
 
+export type Pricing = {
+  input: number;
+  output: number;
+};
+
 export type ModelPricing = {
-  model: {
+  [key: string]: {
     input: number;
     output: number;
   };

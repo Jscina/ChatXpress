@@ -123,7 +123,7 @@ const ChatWindow = ({
 
   return (
     <>
-      <Show when={chatCost() > 0}>
+      <Show when={chatCost() > 0 && activeThread()}>
         <div class="flex justify-end p-4">
           <p class="border-solid border-2 border-green-300 bg-green-100 p-4 rounded dark:text-black">
             Chat Cost: ${chatCost()}

@@ -82,7 +82,7 @@ const ChatInput = ({
   });
 
   return (
-    <div class="flex flex-col mb-4 items-center max-w-[50%] w-full min-w-min py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out">
+    <div class="flex flex-col mb-12 items-center max-w-[50%] w-full min-w-min py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out">
       <form class="m-0 w-full flex flex-col gap-2" onSubmit={sendMessage}>
         <div class="flex items-center space-x-2">
           <Textarea

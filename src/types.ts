@@ -26,6 +26,8 @@ export type Thread = {
   messages?: ChatMessage[];
 };
 
+export type AssistantResponse = [string, Thread];
+
 export type Chat = {
   content: string;
   thread: Thread;

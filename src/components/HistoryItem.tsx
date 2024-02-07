@@ -87,9 +87,12 @@ const ConfirmDelete = ({
       setActiveThread(undefined);
       setChatHistory(null);
     }
-    setDisabled(true);
-    await deleteThread(thread);
-    setOpen(false);
+    try {
+      await deleteThread(thread);
+    } finally {
+      setDisabled(true);
+      setOpen(false);
+    }
   };
 
   return (

@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+#[derive(Deserialize, Serialize, Clone)]
 pub enum Role {
     User,
     Assistant,
@@ -15,9 +16,10 @@ impl Role {
 }
 
 #[derive(Deserialize, Serialize, Clone)]
-pub enum ChatMessage {
-    Role,
-    Content(String),
+pub struct ChatMessage {
+    pub role: Role,
+    pub content: String,
+    pub tokens: Option<usize>,
 }
 
 #[derive(Deserialize, Serialize, Clone)]

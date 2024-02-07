@@ -31,6 +31,7 @@ fn main() {
             read_api_key,
             update_api_key,
             count_tokens,
+            count_total_tokens,
             set_api_key,
             get_model_pricing
         ])

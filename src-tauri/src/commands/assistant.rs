@@ -1,7 +1,7 @@
 use crate::{
     crud::read_api_key,
     run_scraper,
-    schemas::{Assistant, Thread},
+    schemas::{Assistant, ChatMessage, Role, Thread},
     BotState, ModelPricing,
 };
 
@@ -17,8 +17,40 @@ pub async fn get_model_pricing() -> HashMap<String, ModelPricing> {
 #[tauri::command(async, rename_all = "snake_case")]
 pub async fn count_tokens(text: String) -> usize {
     let bpe = cl100k_base().unwrap();
-    let tokens = bpe.encode_with_special_tokens(&text);
-    tokens.len()
+    bpe.encode_with_special_tokens(&text).len()
+}
+
+#[tauri::command(async, rename_all = "snake_case")]
+pub async fn count_total_tokens(history: Vec<ChatMessage>) -> (usize, usize) {
+    let bpe = cl100k_base().unwrap();
+    let input_tokens = history
+        .iter()
+        .filter_map(|msg| {
+            if matches!(msg.role, Role::User) {
+                if let Some(tokens) = msg.tokens {
+                    return Some(tokens);
+                }
+                Some(bpe.encode_with_special_tokens(&msg.content).len())
+            } else {
+                None
+            }
+        })
+        .sum();
+
+    let output_tokens = history
+        .iter()
+        .filter_map(|msg| {
+            if matches!(msg.role, Role::Assistant) {
+                if let Some(tokens) = msg.tokens {
+                    return Some(tokens);
+                }
+                Some(bpe.encode_with_special_tokens(&msg.content).len())
+            } else {
+                None
+            }
+        })
+        .sum();
+    (input_tokens, output_tokens)
 }
 
 #[tauri::command(async, rename_all = "snake_case")]

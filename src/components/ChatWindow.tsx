@@ -2,7 +2,12 @@ import { createSignal, createEffect, Index, Show } from "solid-js";
 import AssistantMessage from "./AssistantMessage";
 import UserMessage from "./UserMessage";
 import Spinner from "./Spinner";
-import { getHistory, getModelPricing, countTokens } from "../api/assistant";
+import {
+  getHistory,
+  getModelPricing,
+  countTokens,
+  countAllTokens,
+} from "../api/assistant";
 import {
   AIRole,
   type ChatMessage,
@@ -32,8 +37,8 @@ interface ChatWindowProps {
   setCurrentMessage: (val: string) => void;
   assistantResponse: () => string;
   setAssistantResponse: (val: string) => void;
-  chatHistory: () => ChatMessage[] | null;
-  setChatHistory: (val: ChatMessage[] | null) => void;
+  chatHistory: () => ChatMessage[];
+  setChatHistory: (val: ChatMessage[]) => void;
   activeThread: () => Thread | undefined;
 }
 
@@ -50,88 +55,70 @@ const ChatWindow = ({
   const [assistantLoading, setAssistantLoading] = createSignal<boolean>(false);
   const [chatCost, setChatCost] = createSignal<number>(0);
 
-  const calculateTokens = async (
-    history: ChatMessage[],
-  ): Promise<ChatMessage[]> => {
-    setChatCost(0);
-    for (let i = 0; i < history.length; i++) {
-      if (history[i].tokens !== undefined) continue;
-      history[i].tokens = await countTokens(history[i].content);
-    }
-    return history;
-  };
-
-  const calculateCost = async (history: ChatMessage[]) => {
+  const calculateCost = async (tokens: [number, number]) => {
     const assistant = activeAssistant();
     if (assistant === undefined) return;
     const model = assistant.model;
     const pricing = await getModelPricing();
     if (!pricing) return;
     const cost = pricing[model];
-    let inputCost = 0;
-    let outputCost = 0;
-    history.forEach((message) => {
-      switch (message.role) {
-        case AIRole.USER:
-          console.log(message.tokens);
-          if (message.tokens === undefined) return;
-          inputCost += (message.tokens / 1000) * cost.input;
-          break;
-        case AIRole.ASSISTANT:
-          console.log(message.tokens);
-          if (message.tokens === undefined) return;
-          outputCost += (message.tokens / 1000) * cost.output;
-          break;
-      }
-    });
+    const inputCost = (tokens[0] / 1000) * cost.input;
+    const outputCost = (tokens[1] / 1000) * cost.output;
     const total = inputCost + outputCost;
-    setChatCost(total);
-    setChatHistory(history);
+    setChatCost(parseFloat(total.toFixed(5)));
+  };
+
+  const addMessageToHistory = async (role: AIRole, message: string) => {
+    const currentHistory = chatHistory() ?? [];
+    const lastRole =
+      currentHistory.length > 0
+        ? currentHistory[currentHistory.length - 1].role
+        : null;
+
+    if (message !== "" && lastRole !== role) {
+      let newHistory = [...currentHistory];
+      newHistory.push({
+        role: role,
+        content: message,
+        tokens: await countTokens(message),
+      });
+
+      setChatHistory(newHistory);
+    }
   };
 
   createEffect(async () => {
-    const currentHistory = chatHistory() ?? [];
-    const userMessage = currentMessage();
-    const assistantMessage = assistantResponse();
-    if (userMessage !== "" && !assistantLoading()) {
-      setChatHistory([
-        ...currentHistory,
-        {
-          role: AIRole.USER,
-          content: userMessage,
-        },
-      ]);
-
+    if (!assistantLoading() && currentMessage() !== "") {
+      await addMessageToHistory(AIRole.USER, currentMessage());
       setAssistantLoading(true);
       setCurrentMessage("");
-    } else if (assistantMessage !== "" && assistantLoading()) {
-      setChatHistory([
-        ...currentHistory,
-        {
-          role: AIRole.ASSISTANT,
-          content: assistantMessage,
-        },
-      ]);
-
-      setAssistantLoading(false);
-      setAssistantResponse("");
-    }
-    if (currentHistory !== chatHistory()) {
-      let history = chatHistory();
-      history = await calculateTokens(history ?? []);
-      await calculateCost(history);
     }
   });
 
-  // Fetch chat history for active thread
+  createEffect(async () => {
+    if (assistantLoading() && assistantResponse() !== "") {
+      await addMessageToHistory(AIRole.ASSISTANT, assistantResponse());
+      setAssistantLoading(false);
+      setAssistantResponse("");
+    }
+  });
+
+  createEffect(async () => {
+    const currentHistory = chatHistory() ?? [];
+    if (currentHistory.length > 0) {
+      const tokens = await countAllTokens(currentHistory);
+      await calculateCost(tokens);
+    }
+  });
+
   createEffect(async () => {
     const thread = activeThread();
     if (thread === undefined) return null;
     let history = await getHistory(thread);
     history = history.reverse();
     setChatHistory(history);
-    history = await calculateTokens(history);
-    await calculateCost(history);
+    const tokens = await countAllTokens(history);
+    await calculateCost(tokens);
   });
 
   return (

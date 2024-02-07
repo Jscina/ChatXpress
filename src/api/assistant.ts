@@ -5,12 +5,32 @@ import type {
   Chat,
   ModelPricing,
   ChatMessage,
+  AssistantResponse,
 } from "../types";
-type AssistantResponse = [string, Thread];
 
 export async function countTokens(text: string): Promise<number> {
   return await invoke("count_tokens", { text: text });
 }
+
+/**
+ * Counts all the input and output tokens in the history
+ * @returns input, output
+ */
+export async function countAllTokens(
+  history: ChatMessage[],
+): Promise<[number, number]> {
+  let tmp = history.map((message) => {
+    let role = message.role.valueOf();
+    role = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+    return {
+      role: role,
+      content: message.content,
+      tokens: message.tokens,
+    };
+  });
+  return await invoke("count_total_tokens", { history: tmp });
+}
+
 export async function setOpenAIApiKey(): Promise<void> {
   try {
     await invoke("set_api_key");
@@ -62,10 +82,6 @@ export async function readApiKey(): Promise<string> {
 
 export async function updateApiKey(apiKey: string): Promise<void> {
   return await invoke("update_api_key", { api_key: apiKey });
-}
-
-export async function deleateThread(thread: Thread): Promise<void> {
-  return await invoke("delete_thread", thread);
 }
 
 export async function conversation(

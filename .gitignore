@@ -29,3 +29,6 @@ Thumbs.db
 *.db
 *.db-journal
 *.db-wal
+
+# Python cache files
+__pycache__/

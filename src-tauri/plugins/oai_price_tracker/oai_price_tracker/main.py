@@ -10,12 +10,14 @@ SEARCH_TABLES = ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"]
 
 
 def fetch_pricing_page() -> BeautifulSoup:
+    """Fetch the pricing page and return the parsed HTML"""
     url = "https://openai.com/pricing/"
     response = requests.get(url)
     return BeautifulSoup(response.text, "html.parser")
 
 
 def clean_page(page: BeautifulSoup) -> list[BeautifulSoup]:
+    """Remove comments and extract tables from the page"""
     comments: list[Tag] = page.find_all(string=lambda text: isinstance(text, Comment))
     for comment in comments:
         comment.extract()
@@ -28,11 +30,13 @@ def clean_page(page: BeautifulSoup) -> list[BeautifulSoup]:
 
 
 def process_table(model_table: BeautifulSoup) -> dict:
+    """Extract the model name and prices from the table"""
     table = model_table.find("table")
     table = BeautifulSoup(str(table), "html.parser")
     rows = table.find_all("tr")[1:]
 
     def transform_row(row: Tag) -> tuple[str, dict[str, float]]:
+        """Extract the model name and prices from a row"""
         cols = row.find_all("td")
         model_name = cols[0].text.strip()
         input_price = (

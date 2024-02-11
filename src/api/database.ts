@@ -3,6 +3,7 @@ import type { Thread, HistoryEntry } from "../types";
 
 export async function listThreads(): Promise<Thread[]> {
   const history = (await invoke("history_read")) as HistoryEntry[];
+  if (history.length === 0) return [];
   return history.map((entry) => {
     return { id: entry.thread_id, name: entry.thread_name } as Thread;
   });

@@ -41,6 +41,7 @@ const UserProfile = ({ apiKey, setApiKey }: UserProfileProps) => {
   const toggleDarkMode = () => {
     document.body.classList.toggle("dark");
     setDarkMode(!darkMode());
+    localStorage.setItem("darkMode", JSON.stringify(darkMode()));
   };
 
   const toggleMenu = () => {
@@ -64,6 +65,11 @@ const UserProfile = ({ apiKey, setApiKey }: UserProfileProps) => {
 
   onMount(() => {
     setDisplayName("Settings");
+
+    const darkMode = JSON.parse(localStorage.getItem("darkMode") || "false");
+    if (darkMode) {
+      toggleDarkMode();
+    }
   });
 
   return (

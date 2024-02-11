@@ -71,6 +71,7 @@ interface ConfirmDeleteProps {
   activeThread: () => Thread | undefined;
   setActiveThread: (val: Thread | undefined) => void;
   setChatHistory: (val: ChatMessage[]) => void;
+  setHistory: (val: Thread[] | null) => void;
 }
 
 const ConfirmDelete = ({
@@ -81,19 +82,23 @@ const ConfirmDelete = ({
   activeThread,
   setActiveThread,
   setChatHistory,
+  setHistory,
 }: ConfirmDeleteProps) => {
   const handleDelete = async () => {
+    setDisabled(true);
     if (activeThread()?.id === thread.id) {
       setActiveThread(undefined);
       setChatHistory([]);
+      const threads = await listThreads();
+      setHistory(threads.filter((t) => t.id !== thread.id));
     }
     try {
       // If we can't delete the thread then it wasn't added to the database
       await deleteThread(thread);
     } finally {
+      setDisabled(true);
       setOpen(false);
     }
-    setDisabled(true);
   };
 
   return (
@@ -203,13 +208,6 @@ const HistoryItem = ({
     thread.name = name();
   });
 
-  createEffect(async () => {
-    if (disabled()) {
-      const threads = await listThreads();
-      setHistory(threads);
-    }
-  });
-
   return (
     <>
       <Show when={!disabled()} fallback={null}>
@@ -242,6 +240,7 @@ const HistoryItem = ({
         setDisabled={setDisabled}
         activeThread={activeThread}
         setChatHistory={setChatHistory}
+        setHistory={setHistory}
         setActiveThread={setActiveThread}
       />
     </>

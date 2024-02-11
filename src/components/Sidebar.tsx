@@ -11,7 +11,8 @@ interface SidebarProps {
   isSidebarOpen: () => boolean;
   activeThread: () => Thread | undefined;
   setActiveThread: (val: Thread | undefined) => void;
-  setChatHistory: (val: ChatMessage[] | null) => void;
+  chatHistory: () => ChatMessage[];
+  setChatHistory: (val: ChatMessage[]) => void;
   setApiKey: (val: string) => void;
   apiKey: () => string;
 }
@@ -21,6 +22,7 @@ const Sidebar = ({
   isSidebarOpen,
   activeThread,
   setActiveThread,
+  chatHistory,
   setChatHistory,
   setApiKey,
   apiKey,
@@ -32,11 +34,11 @@ const Sidebar = ({
 
   const handleNewChat = () => {
     setActiveThread(undefined);
-    setChatHistory(null);
+    setChatHistory([]);
   };
 
   createEffect(async () => {
-    if (!activeThread()) {
+    if (!activeThread() || chatHistory().length > 0) {
       const threads = await listThreads();
       setHistory(threads);
     }
@@ -85,6 +87,7 @@ const Sidebar = ({
                     thread={message}
                     activeThread={activeThread}
                     setChatHistory={setChatHistory}
+                    setHistory={setHistory}
                     setActiveThread={setActiveThread}
                   />
                 );

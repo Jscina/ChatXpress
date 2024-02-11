@@ -69,21 +69,26 @@ const ChatWindow = ({
   };
 
   const addMessageToHistory = async (role: AIRole, message: string) => {
-    const currentHistory = chatHistory() ?? [];
+    const currentHistory = chatHistory();
     const lastRole =
       currentHistory.length > 0
         ? currentHistory[currentHistory.length - 1].role
         : null;
 
-    if (message !== "" && lastRole !== role) {
+    const addMessageToHistory = () => {
       let newHistory = [...currentHistory];
       newHistory.push({
         role: role,
         content: message,
-        tokens: await countTokens(message),
       });
 
       setChatHistory(newHistory);
+    };
+
+    if (message !== "" && lastRole !== role) {
+      addMessageToHistory();
+    } else if (message !== "" && lastRole === null) {
+      addMessageToHistory();
     }
   };
 
@@ -104,26 +109,33 @@ const ChatWindow = ({
   });
 
   createEffect(async () => {
-    const currentHistory = chatHistory() ?? [];
-    if (currentHistory.length > 0) {
-      const tokens = await countAllTokens(currentHistory);
+    const currentHistory = chatHistory();
+    const history = await countTokens(currentHistory);
+
+    if (currentHistory.length > 1) {
+      if (JSON.stringify(history) !== JSON.stringify(currentHistory)) {
+        setChatHistory(history);
+      }
+      const tokens = await countAllTokens(history);
       await calculateCost(tokens);
     }
   });
 
   createEffect(async () => {
-    const thread = activeThread();
-    if (thread === undefined) return null;
-    let history = await getHistory(thread);
-    history = history.reverse();
-    setChatHistory(history);
-    const tokens = await countAllTokens(history);
-    await calculateCost(tokens);
+    try {
+      const thread = activeThread();
+      if (thread === undefined) return null;
+      let history = await getHistory(thread);
+      history = history.reverse();
+      setChatHistory(history);
+    } catch (e) {
+      console.error(e);
+    }
   });
 
   return (
     <>
-      <Show when={chatCost() > 0 && activeThread()}>
+      <Show when={chatCost() > 0 && activeThread() && chatHistory().length > 0}>
         <div class="flex justify-end p-4">
           <p class="border-solid border-2 border-green-300 bg-green-100 p-4 rounded dark:text-black">
             Chat Cost: ${chatCost()}

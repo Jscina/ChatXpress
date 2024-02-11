@@ -6,6 +6,7 @@ use crate::{
 };
 
 use async_openai::types::{MessageContent, MessageRole};
+use rayon::prelude::*;
 use std::collections::HashMap;
 use tiktoken_rs::cl100k_base;
 
@@ -14,42 +15,46 @@ pub async fn get_model_pricing() -> HashMap<String, ModelPricing> {
     run_scraper()
 }
 
+/// Calculates the number of tokens in a message and adds the tokens to the message
+/// Returns the history with the tokens
 #[tauri::command(async, rename_all = "snake_case")]
-pub async fn count_tokens(text: String) -> usize {
+pub async fn count_tokens(history: Vec<ChatMessage>) -> Vec<ChatMessage> {
     let bpe = cl100k_base().unwrap();
-    bpe.encode_with_special_tokens(&text).len()
+    history
+        .into_par_iter()
+        .map(|mut msg| {
+            if msg.tokens.is_none() {
+                let tokens = bpe.encode_with_special_tokens(&msg.content).len();
+                msg.tokens = Some(tokens);
+            }
+            msg
+        })
+        .collect()
 }
 
+/// Calculates the total input and output tokens in a conversation
+/// Returns a tuple of the input and output tokens
 #[tauri::command(async, rename_all = "snake_case")]
 pub async fn count_total_tokens(history: Vec<ChatMessage>) -> (usize, usize) {
     let bpe = cl100k_base().unwrap();
-    let input_tokens = history
-        .iter()
-        .filter_map(|msg| {
-            if matches!(msg.role, Role::User) {
-                if let Some(tokens) = msg.tokens {
-                    return Some(tokens);
-                }
-                Some(bpe.encode_with_special_tokens(&msg.content).len())
-            } else {
-                None
-            }
-        })
-        .sum();
 
-    let output_tokens = history
-        .iter()
-        .filter_map(|msg| {
-            if matches!(msg.role, Role::Assistant) {
-                if let Some(tokens) = msg.tokens {
-                    return Some(tokens);
+    let calc_tokens = |_role: Role| {
+        history
+            .par_iter()
+            .filter_map(|msg| {
+                if matches!(&msg.role, _role) {
+                    if let Some(tokens) = msg.tokens {
+                        return Some(tokens);
+                    }
+                    Some(bpe.encode_with_special_tokens(&msg.content).len())
+                } else {
+                    None
                 }
-                Some(bpe.encode_with_special_tokens(&msg.content).len())
-            } else {
-                None
-            }
-        })
-        .sum();
+            })
+            .sum()
+    };
+    let input_tokens = calc_tokens(Role::User);
+    let output_tokens = calc_tokens(Role::Assistant);
     (input_tokens, output_tokens)
 }
 
@@ -194,4 +199,28 @@ pub async fn list_assistants(state: tauri::State<'_, BotState>) -> Result<Vec<As
         })
         .collect::<Vec<Assistant>>();
     Ok(res)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_count_tokens() {
+        let history = vec![
+            ChatMessage {
+                role: Role::User,
+                content: "Hello".into(),
+                tokens: None,
+            },
+            ChatMessage {
+                role: Role::Assistant,
+                content: "Hi".into(),
+                tokens: None,
+            },
+        ];
+        let res = count_tokens(history).await;
+        assert_eq!(res[0].tokens, Some(2));
+        assert_eq!(res[1].tokens, Some(1));
+    }
 }

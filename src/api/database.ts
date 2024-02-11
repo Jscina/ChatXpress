@@ -19,10 +19,14 @@ export async function deleteThread(thread: Thread): Promise<void> {
   try {
     await invoke("history_delete", { thread_id: thread.id });
   } catch (e) {
-    console.error(e);
+    console.error("Thread already deleted or doesn't exist");
   } finally {
     // This might throw an error if the thread is already deleted or doesn't exist
-    await invoke("delete_thread", { thread: thread });
+    try {
+      await invoke("delete_thread", { thread: thread });
+    } catch {
+      console.error("Thread already deleted");
+    }
   }
 }
 

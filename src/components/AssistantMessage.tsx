@@ -1,6 +1,5 @@
 import { onMount, createSignal, Show } from "solid-js";
 import { marked } from "marked";
-import { countTokens } from "../api/assistant";
 import hljs from "highlight.js";
 import DOMPurify from "dompurify";
 
@@ -26,16 +25,10 @@ interface AssistantMessageProps {
 const AssistantMessage = ({ message, tokens }: AssistantMessageProps) => {
   const [markdownContent, setMarkdownContent] = createSignal<string>("");
   const [errorOccured, setErrorOccured] = createSignal<boolean>(false);
-  const [outputTokens, setOutputTokens] = createSignal<number | undefined>(
-    tokens,
-  );
   onMount(async () => {
     if (!message) {
       setErrorOccured(true);
       return;
-    }
-    if (outputTokens() === undefined || outputTokens() === 0) {
-      setOutputTokens(await countTokens(message));
     }
     const markedContent = await marked(message);
     const sanitizedContent = DOMPurify.sanitize(markedContent);
@@ -44,6 +37,7 @@ const AssistantMessage = ({ message, tokens }: AssistantMessageProps) => {
   });
 
   if (message === "") {
+    tokens;
     setErrorOccured(true);
     return;
   }
@@ -51,8 +45,8 @@ const AssistantMessage = ({ message, tokens }: AssistantMessageProps) => {
   return (
     <Show when={!errorOccured()} fallback={<ErrorMessage />}>
       <div class="relative flex flex-col">
-        <Show when={outputTokens() && outputTokens() !== 0}>
-          <p class="absolute top-0 right-0 p-4">Tokens: {outputTokens()}</p>
+        <Show when={tokens && tokens !== 0}>
+          <p class="absolute top-0 right-0 p-4">Tokens: {tokens}</p>
         </Show>
         <div class="flex flex-row justify-center p-4">
           <div class="flex p-2 max-w-[50%] w-full">

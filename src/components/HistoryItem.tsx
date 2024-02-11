@@ -2,7 +2,7 @@ import { createSignal, createEffect, Show } from "solid-js";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogDescription } from "./ui/dialog";
-import { deleteThread, updateThread } from "../api/database";
+import { deleteThread, updateThread, listThreads } from "../api/database";
 import type { ChatMessage, Thread } from "../types";
 
 interface EditableItemProps {
@@ -70,7 +70,7 @@ interface ConfirmDeleteProps {
   setDisabled: (val: boolean) => void;
   activeThread: () => Thread | undefined;
   setActiveThread: (val: Thread | undefined) => void;
-  setChatHistory: (val: ChatMessage[] | null) => void;
+  setChatHistory: (val: ChatMessage[]) => void;
 }
 
 const ConfirmDelete = ({
@@ -85,14 +85,15 @@ const ConfirmDelete = ({
   const handleDelete = async () => {
     if (activeThread()?.id === thread.id) {
       setActiveThread(undefined);
-      setChatHistory(null);
+      setChatHistory([]);
     }
     try {
+      // If we can't delete the thread then it wasn't added to the database
       await deleteThread(thread);
     } finally {
-      setDisabled(true);
       setOpen(false);
     }
+    setDisabled(true);
   };
 
   return (
@@ -148,7 +149,6 @@ const NonEditableItem = ({
   const deleteHistory = async () => {
     if (!disabled()) setOpen(true);
   };
-  createEffect(async () => {});
 
   return (
     <>
@@ -181,7 +181,8 @@ const NonEditableItem = ({
 interface HistoryItemProps {
   thread: Thread;
   activeThread: () => Thread | undefined;
-  setChatHistory: (val: ChatMessage[] | null) => void;
+  setHistory: (val: Thread[] | null) => void;
+  setChatHistory: (val: ChatMessage[]) => void;
   setActiveThread: (val: Thread | undefined) => void;
 }
 
@@ -189,6 +190,7 @@ const HistoryItem = ({
   thread,
   activeThread,
   setActiveThread,
+  setHistory,
   setChatHistory,
 }: HistoryItemProps) => {
   const [editable, setEditable] = createSignal(false);
@@ -199,6 +201,13 @@ const HistoryItem = ({
 
   createEffect(() => {
     thread.name = name();
+  });
+
+  createEffect(async () => {
+    if (disabled()) {
+      const threads = await listThreads();
+      setHistory(threads);
+    }
   });
 
   return (

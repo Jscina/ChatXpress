@@ -8,8 +8,28 @@ import type {
   AssistantResponse,
 } from "../types";
 
-export async function countTokens(text: string): Promise<number> {
-  return await invoke("count_tokens", { text: text });
+function map_history(history: ChatMessage[]): ChatMessage[] {
+  return history.map((message) => {
+    let role = message.role.valueOf();
+    role = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+    return {
+      role: role,
+      content: message.content,
+      tokens: message.tokens,
+    } as ChatMessage;
+  });
+}
+
+export async function countTokens(
+  history: ChatMessage[],
+): Promise<ChatMessage[]> {
+  let tmp = map_history(history);
+  try {
+    history = await invoke("count_tokens", { history: tmp });
+    return history;
+  } catch {
+    return history;
+  }
 }
 
 /**
@@ -19,15 +39,7 @@ export async function countTokens(text: string): Promise<number> {
 export async function countAllTokens(
   history: ChatMessage[],
 ): Promise<[number, number]> {
-  let tmp = history.map((message) => {
-    let role = message.role.valueOf();
-    role = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
-    return {
-      role: role,
-      content: message.content,
-      tokens: message.tokens,
-    };
-  });
+  let tmp = map_history(history);
   return await invoke("count_total_tokens", { history: tmp });
 }
 

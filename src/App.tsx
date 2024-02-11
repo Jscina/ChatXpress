@@ -40,6 +40,7 @@ const App = () => {
         isSidebarOpen={isSidebarOpen}
         setSidebarOpen={setSidebarOpen}
         setActiveThread={setActiveThread}
+        chatHistory={chatHistory}
         setChatHistory={setChatHistory}
         apiKey={apiKey}
         setApiKey={setApiKey}

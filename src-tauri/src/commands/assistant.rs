@@ -12,7 +12,8 @@ use tiktoken_rs::cl100k_base;
 
 #[tauri::command(async, rename_all = "snake_case")]
 pub async fn get_model_pricing() -> Result<HashMap<String, ModelPricing>, String> {
-    match run_scraper() {
+    let res = run_scraper().await;
+    match res {
         Ok(prices) => Ok(prices),
         Err(e) => Err(e.to_string()),
     }

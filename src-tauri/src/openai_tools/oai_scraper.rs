@@ -14,17 +14,11 @@ impl ModelPricing {
     }
 }
 
-pub fn run_scraper() -> HashMap<String, ModelPricing> {
+pub fn run_scraper() -> Result<HashMap<String, ModelPricing>, PyErr> {
     let code: &str = include_str!("../../plugins/oai_price_tracker/oai_price_tracker/main.py");
     Python::with_gil(|py| {
         let module = PyModule::from_code(py, code, "main.py", "oai_price_tracker");
-
-        let main = module.expect("Module not found");
-        let res: &PyDict = main
-            .call_method0("main")
-            .expect("Error calling main")
-            .downcast::<PyDict>()
-            .expect("Error downcasting to PyDict");
+        let res: &PyDict = module?.call_method0("main")?.downcast::<PyDict>()?;
 
         let mut prices: HashMap<String, ModelPricing> = HashMap::new();
         res.iter().for_each(|(key, value)| {
@@ -47,6 +41,6 @@ pub fn run_scraper() -> HashMap<String, ModelPricing> {
 
             prices.insert(key, ModelPricing::new(input, output));
         });
-        prices
+        Ok(prices)
     })
 }

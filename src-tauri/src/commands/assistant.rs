@@ -11,8 +11,11 @@ use std::collections::HashMap;
 use tiktoken_rs::cl100k_base;
 
 #[tauri::command(async, rename_all = "snake_case")]
-pub async fn get_model_pricing() -> HashMap<String, ModelPricing> {
-    run_scraper()
+pub async fn get_model_pricing() -> Result<HashMap<String, ModelPricing>, String> {
+    match run_scraper() {
+        Ok(prices) => Ok(prices),
+        Err(e) => Err(e.to_string()),
+    }
 }
 
 /// Calculates the number of tokens in a message and adds the tokens to the message

@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "A customizable chatbot for use with openai's api."
 authors = ["Joshua Scina"]
 license = "GPL-3.0-or-later"
-repository = ""
+repository = "https://github.com/Jscina/ChatXpress"
 edition = "2021"
 
 [lib]
@@ -25,8 +25,10 @@ tokio = { version = "1.34.0", features = ["full"] }
 sqlx = { version = "0.7.2", features = ["runtime-tokio", "sqlite"] }
 lazy_static = "1.4.0"
 tiktoken-rs = { version = "0.5.8", features = ["async-openai"] }
-pyo3 = { version = "0.20.2", features = ["auto-initialize", "serde"] }
 rayon = "1.8.1"
+reqwest = "0.11.24"
+scraper = "0.18.1"
+regex = "1.10.3"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

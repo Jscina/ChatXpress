@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "plugins"
+version = "0.1.0"
+description = ""
+authors = ["Josh <joshscina@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+oai-price-tracker = { path = "plugins/oai_price_tracker/dist/oai_price_tracker-0.1.0-py3-none-any.whl" }
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

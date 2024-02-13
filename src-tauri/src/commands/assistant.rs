@@ -200,11 +200,13 @@ pub async fn list_assistants(state: tauri::State<'_, BotState>) -> Result<Vec<As
         state_guard.bot.clone()
     };
 
-    let res = bot
-        .list_assistants()
-        .await
-        .map_err(|e| e.to_string())?
-        .iter()
+    let res = bot.list_assistants().await;
+    let res = match res {
+        Ok(res) => res,
+        Err(e) => return Err(e.to_string()),
+    };
+    let res = res
+        .par_iter()
         .map(|x| {
             Assistant::new(
                 x.id.clone(),

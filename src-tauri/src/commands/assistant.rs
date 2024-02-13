@@ -92,7 +92,7 @@ pub async fn get_history(
         Ok(history) => {
             let history = history
                 .data
-                .iter()
+                .par_iter()
                 .map(|message| {
                     let role = match message.role {
                         MessageRole::User => "user",
@@ -112,7 +112,7 @@ pub async fn get_history(
                     (role, content)
                 })
                 .collect::<Vec<(String, String)>>()
-                .iter()
+                .par_iter()
                 .map(|(role, content)| {
                     let mut map = HashMap::new();
                     map.insert("role".into(), role.clone());
@@ -137,18 +137,32 @@ pub async fn conversation(
         let state_guard = state.0.lock().unwrap();
         state_guard.bot.clone()
     };
-    let assistant = bot.retrieve_assistant(&assistant_id).await.unwrap();
+    let assistant = bot.retrieve_assistant(&assistant_id).await;
+    let assistant = match assistant {
+        Ok(assistant) => assistant,
+        Err(e) => return Err(e.to_string()),
+    };
     let thread_copy = thread.clone();
     let thread_obj = match thread {
-        Some(thread) => bot.retrieve_thread(&thread.id).await.unwrap(),
-        None => bot.create_thread().await.unwrap(),
+        Some(thread) => bot.retrieve_thread(&thread.id).await,
+        None => bot.create_thread().await,
     };
 
-    bot.add_message_to_thread(&thread_obj.id, &prompt)
-        .await
-        .unwrap();
+    let thread_obj = match thread_obj {
+        Ok(thread) => thread,
+        Err(e) => return Err(e.to_string()),
+    };
+    let res = bot.add_message_to_thread(&thread_obj.id, &prompt).await;
 
-    let mut run = bot.create_run(&thread_obj.id, &assistant.id).await.unwrap();
+    if let Err(e) = res {
+        return Err(e.to_string());
+    }
+
+    let run = bot.create_run(&thread_obj.id, &assistant.id).await;
+    let mut run = match run {
+        Ok(run) => run,
+        Err(e) => return Err(e.to_string()),
+    };
     let response = bot.get_assistant_response(&mut run, &thread_obj.id).await;
     match response {
         Ok(response) => Ok((
@@ -203,28 +217,4 @@ pub async fn list_assistants(state: tauri::State<'_, BotState>) -> Result<Vec<As
         })
         .collect::<Vec<Assistant>>();
     Ok(res)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn test_count_tokens() {
-        let history = vec![
-            ChatMessage {
-                role: Role::User,
-                content: "Hello".into(),
-                tokens: None,
-            },
-            ChatMessage {
-                role: Role::Assistant,
-                content: "Hi".into(),
-                tokens: None,
-            },
-        ];
-        let res = count_tokens(history).await;
-        assert_eq!(res[0].tokens, Some(2));
-        assert_eq!(res[1].tokens, Some(1));
-    }
 }

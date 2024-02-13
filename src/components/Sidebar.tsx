@@ -3,7 +3,7 @@ import clsx from "clsx";
 import UserProfile from "./UserProfile";
 import HistoryItem from "./HistoryItem";
 import { Button } from "./ui/button";
-import type { Thread, ChatMessage } from "../types";
+import type { Thread, ChatMessage, Error } from "../types";
 import { listThreads } from "../api/database";
 
 interface SidebarProps {
@@ -15,6 +15,8 @@ interface SidebarProps {
   setChatHistory: (val: ChatMessage[]) => void;
   setApiKey: (val: string) => void;
   apiKey: () => string;
+  error: () => Error | undefined;
+  setError: (error: Error | undefined) => void;
 }
 
 const Sidebar = ({
@@ -26,6 +28,8 @@ const Sidebar = ({
   setChatHistory,
   setApiKey,
   apiKey,
+  error,
+  setError,
 }: SidebarProps) => {
   const [history, setHistory] = createSignal<Thread[] | null>(null);
   const toggleSidebar = () => {
@@ -98,7 +102,12 @@ const Sidebar = ({
         <div class="flex-none">
           <hr />
           <div class="flex flex-col space-y-2 p-4 mb-auto">
-            <UserProfile apiKey={apiKey} setApiKey={setApiKey} />
+            <UserProfile
+              apiKey={apiKey}
+              setApiKey={setApiKey}
+              error={error}
+              setError={setError}
+            />
           </div>
         </div>
       </nav>

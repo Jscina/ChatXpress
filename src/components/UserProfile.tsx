@@ -2,6 +2,7 @@ import { createSignal, onMount, createEffect, Show } from "solid-js";
 import SettingsMenu from "./SettingsMenu";
 import clsx from "clsx";
 import { Button } from "./ui/button";
+import type { Error } from "../types";
 
 interface MenuItemProps {
   name: string;
@@ -24,9 +25,16 @@ const MenuItem = ({ name, onClick, children }: MenuItemProps) => (
 interface UserProfileProps {
   apiKey: () => string;
   setApiKey: (val: string) => void;
+  error: () => Error | undefined;
+  setError: (error: Error | undefined) => void;
 }
 
-const UserProfile = ({ apiKey, setApiKey }: UserProfileProps) => {
+const UserProfile = ({
+  apiKey,
+  setApiKey,
+  error,
+  setError,
+}: UserProfileProps) => {
   const [showMenu, setShowMenu] = createSignal(false);
   const [darkMode, setDarkMode] = createSignal(false);
   const [displayName, setDisplayName] = createSignal("");
@@ -60,6 +68,12 @@ const UserProfile = ({ apiKey, setApiKey }: UserProfileProps) => {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
+    }
+  });
+
+  createEffect(() => {
+    if (apiKey() !== "" && error()) {
+      setError(undefined);
     }
   });
 

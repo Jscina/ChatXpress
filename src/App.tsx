@@ -6,7 +6,7 @@ import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
 import { Alert, AlertTitle, AlertDescription } from "./components/ui/alert";
 import { readApiKey, setOpenAIApiKey } from "./api/assistant";
-import type { Assistant, Thread, ChatMessage } from "./types";
+import type { Assistant, Thread, ChatMessage, Error } from "./types";
 
 const App = () => {
   const [isSidebarOpen, setSidebarOpen] = createSignal<boolean>(false);
@@ -16,6 +16,7 @@ const App = () => {
   const [activeThread, setActiveThread] = createSignal<Thread>();
   const [chatHistory, setChatHistory] = createSignal<ChatMessage[]>([]);
   const [apiKey, setApiKey] = createSignal<string>("");
+  const [error, setError] = createSignal<Error>();
 
   onMount(async () => {
     try {
@@ -23,7 +24,10 @@ const App = () => {
       await setOpenAIApiKey();
     } catch (e) {
       setApiKey("");
-      console.error(e);
+      setError({
+        title: "API Key not found",
+        message: "Please enter an API key in settings menu to continue",
+      });
     }
   });
 
@@ -34,6 +38,8 @@ const App = () => {
         setSidebarOpen={setSidebarOpen}
         setActiveAssistant={setActiveAssistant}
         apiKey={apiKey}
+        setError={setError}
+        error={error}
       />
       <Sidebar
         activeThread={activeThread}
@@ -44,6 +50,8 @@ const App = () => {
         setChatHistory={setChatHistory}
         apiKey={apiKey}
         setApiKey={setApiKey}
+        error={error}
+        setError={setError}
       />
       <main
         class={clsx(
@@ -74,13 +82,11 @@ const App = () => {
             activeThread={activeThread}
           />
         </div>
-        <Show when={!apiKey()}>
+        <Show when={error() !== undefined}>
           <div class="fixed inset-0 flex  items-center justify-center z-50">
             <Alert class="max-w-[50%]">
-              <AlertTitle class="text-2xl">API Key Required</AlertTitle>
-              <AlertDescription>
-                Please enter your API key in the settings menu to continue.
-              </AlertDescription>
+              <AlertTitle class="text-2xl">{error()?.title}</AlertTitle>
+              <AlertDescription>{error()?.message}</AlertDescription>
             </Alert>
           </div>
         </Show>

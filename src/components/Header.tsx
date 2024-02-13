@@ -10,13 +10,15 @@ import {
 } from "./ui/select";
 
 import { Button } from "./ui/button";
-import type { Assistant } from "../types";
+import type { Assistant, Error } from "../types";
 
 interface HeaderProps {
   setActiveAssistant: (assistant: Assistant) => void;
   setSidebarOpen: (val: boolean) => void;
   isSidebarOpen: () => boolean;
   apiKey: () => string;
+  error: () => Error | undefined;
+  setError: (error: Error | undefined) => void;
 }
 
 const Header = ({
@@ -24,6 +26,8 @@ const Header = ({
   isSidebarOpen,
   setActiveAssistant,
   apiKey,
+  error,
+  setError,
 }: HeaderProps) => {
   const [selectedAssistant, setSelectedAssistant] = createSignal<string>("");
   const [assistants, setAssistants] = createSignal<string[]>([]);
@@ -51,8 +55,12 @@ const Header = ({
       const assistants = await listAssistants();
       setAvailableAssistants(assistants);
       setAssistants(assistants.map((assistant) => assistant.name));
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      setError({
+        title: "Error fetching assistants",
+        message: e,
+      });
+      console.log(error());
     }
   };
 

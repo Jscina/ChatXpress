@@ -46,8 +46,10 @@ export type Pricing = {
 };
 
 export type ModelPricing = {
-  [key: string]: {
-    input: number;
-    output: number;
-  };
+  [key: string]: Pricing;
+};
+
+export type Error = {
+  title: string;
+  message: string;
 };

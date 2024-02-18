@@ -1,9 +1,9 @@
 # Stage 1: Python dependencies
 FROM python:3.11-slim-buster as python-deps
 
-WORKDIR /app/src-tauri/src/plugins/
-
 COPY . /app
+
+WORKDIR /app/src-tauri/src/plugins/
 
 RUN pip install poetry \
   && poetry config virtualenvs.create false \

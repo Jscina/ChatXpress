@@ -63,9 +63,9 @@ const App = () => {
           <ChatWindow chatStore={chatStore} setChatStore={setChatStore} />
           <ChatInput chatStore={chatStore} setChatStore={setChatStore} />
         </div>
-        <Show when={chatStore.error !== undefined}>
+        <Show when={chatStore.error !== null}>
           <div class="fixed inset-0 flex  items-center justify-center z-50">
-            <Alert class="max-w-[50%]">
+            <Alert class="max-w-[50%] dark:bg-dark dark:text-white">
               <AlertTitle class="text-2xl">{chatStore.error?.title}</AlertTitle>
               <AlertDescription>{chatStore.error?.message}</AlertDescription>
             </Alert>

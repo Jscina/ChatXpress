@@ -2,7 +2,7 @@ import { createSignal, onMount, createEffect, Show } from "solid-js";
 import SettingsMenu from "./SettingsMenu";
 import clsx from "clsx";
 import { Button } from "./ui/button";
-import type { Error } from "../types";
+import type { ChatStore, SetChatStore } from "../types";
 
 interface MenuItemProps {
   name: string;
@@ -23,18 +23,11 @@ const MenuItem = ({ name, onClick, children }: MenuItemProps) => (
 );
 
 interface UserProfileProps {
-  apiKey: () => string;
-  setApiKey: (val: string) => void;
-  error: () => Error | undefined;
-  setError: (error: Error | undefined) => void;
+  chatStore: ChatStore;
+  setChatStore: SetChatStore;
 }
 
-const UserProfile = ({
-  apiKey,
-  setApiKey,
-  error,
-  setError,
-}: UserProfileProps) => {
+const UserProfile = ({ chatStore, setChatStore }: UserProfileProps) => {
   const [showMenu, setShowMenu] = createSignal(false);
   const [darkMode, setDarkMode] = createSignal(false);
   const [displayName, setDisplayName] = createSignal("");
@@ -72,8 +65,8 @@ const UserProfile = ({
   });
 
   createEffect(() => {
-    if (apiKey() !== "" && error()) {
-      setError(undefined);
+    if (chatStore.apiKey !== "" && chatStore.error) {
+      setChatStore("error", null);
     }
   });
 
@@ -119,8 +112,8 @@ const UserProfile = ({
       <SettingsMenu
         open={open}
         setOpen={setOpen}
-        apiKey={apiKey}
-        setApiKey={setApiKey}
+        chatStore={chatStore}
+        setChatStore={setChatStore}
       />
     </>
   );

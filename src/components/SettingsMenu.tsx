@@ -10,6 +10,7 @@ import {
 } from "./ui/dialog";
 
 import { updateApiKey } from "../api/assistant";
+import type { ChatStore, SetChatStore } from "../types";
 
 interface MenuItemProps {
   name: string;
@@ -28,8 +29,8 @@ const SettingsItem = ({ name, children }: MenuItemProps) => {
 interface SettingsMenuProps {
   open: () => boolean;
   setOpen: (val: boolean) => void;
-  setApiKey: (val: string) => void;
-  apiKey: () => string;
+  chatStore: ChatStore;
+  setChatStore: SetChatStore;
 }
 
 const SettingsMenu = (props: SettingsMenuProps) => {
@@ -54,12 +55,12 @@ const SettingsMenu = (props: SettingsMenuProps) => {
             <SettingsItem name="Api Key">
               <Input
                 onChange={async (e) => {
-                  props.setApiKey(e.currentTarget.value);
-                  await updateApiKey(props.apiKey());
+                  props.setChatStore("apiKey", e.currentTarget.value);
+                  await updateApiKey(props.chatStore.apiKey);
                 }}
                 type={!apiKeyReveal() ? "password" : "text"}
                 placeholder="Enter API Key..."
-                value={props.apiKey()}
+                value={props.chatStore.apiKey}
                 class="border-solid border-2 border-neutral-600 dark:bg-dark dark:text-white rounded"
               />
               <Button

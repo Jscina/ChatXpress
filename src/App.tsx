@@ -1,4 +1,5 @@
 import { createSignal, onMount, Show } from "solid-js";
+import { createStore } from "solid-js/store";
 import clsx from "clsx";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
@@ -10,24 +11,27 @@ import type { Assistant, Thread, ChatMessage, Error } from "./types";
 
 const App = () => {
   const [isSidebarOpen, setSidebarOpen] = createSignal<boolean>(false);
-  const [assistantResponse, setAssistantResponse] = createSignal<string>("");
-  const [currentMessage, setCurrentMessage] = createSignal<string>("");
-  const [activeAssistant, setActiveAssistant] = createSignal<Assistant>();
-  const [activeThread, setActiveThread] = createSignal<Thread>();
-  const [chatHistory, setChatHistory] = createSignal<ChatMessage[]>([]);
-  const [apiKey, setApiKey] = createSignal<string>("");
-  const [error, setError] = createSignal<Error>();
+  const [chatStore, setChatStore] = createStore({
+    assistantResponse: "" as string,
+    currentMessage: "" as string,
+    activeAssistant: null as Assistant | null,
+    activeThread: null as Thread | null,
+    chatHistory: [] as ChatMessage[],
+    apiKey: "" as string,
+    error: null as Error | null,
+  });
 
   onMount(async () => {
     try {
-      setApiKey(await readApiKey());
+      const apiKey = await readApiKey();
+      setChatStore("apiKey", apiKey);
       await setOpenAIApiKey();
     } catch (e) {
-      setApiKey("");
-      setError({
+      setChatStore("apiKey", "");
+      setChatStore("error", {
         title: "API Key not found",
         message: "Please enter an API key in settings menu to continue",
-      });
+      } as Error);
     }
   });
 
@@ -36,22 +40,14 @@ const App = () => {
       <Header
         isSidebarOpen={isSidebarOpen}
         setSidebarOpen={setSidebarOpen}
-        setActiveAssistant={setActiveAssistant}
-        apiKey={apiKey}
-        setError={setError}
-        error={error}
+        chatStore={chatStore}
+        setChatStore={setChatStore}
       />
       <Sidebar
-        activeThread={activeThread}
         isSidebarOpen={isSidebarOpen}
         setSidebarOpen={setSidebarOpen}
-        setActiveThread={setActiveThread}
-        chatHistory={chatHistory}
-        setChatHistory={setChatHistory}
-        apiKey={apiKey}
-        setApiKey={setApiKey}
-        error={error}
-        setError={setError}
+        chatStore={chatStore}
+        setChatStore={setChatStore}
       />
       <main
         class={clsx(
@@ -64,29 +60,14 @@ const App = () => {
         )}
       >
         <div class="flex flex-col p-8 mt-16 bg-light dark:bg-dark h-screen justify-center items-center">
-          <ChatWindow
-            activeAssistant={activeAssistant}
-            currentMessage={currentMessage}
-            setCurrentMessage={setCurrentMessage}
-            assistantResponse={assistantResponse}
-            setAssistantResponse={setAssistantResponse}
-            chatHistory={chatHistory}
-            setChatHistory={setChatHistory}
-            activeThread={activeThread}
-          />
-          <ChatInput
-            setCurrentMessage={setCurrentMessage}
-            activeAssistant={activeAssistant}
-            setAssistantResponse={setAssistantResponse}
-            setActiveThread={setActiveThread}
-            activeThread={activeThread}
-          />
+          <ChatWindow chatStore={chatStore} setChatStore={setChatStore} />
+          <ChatInput chatStore={chatStore} setChatStore={setChatStore} />
         </div>
-        <Show when={error() !== undefined}>
+        <Show when={chatStore.error !== undefined}>
           <div class="fixed inset-0 flex  items-center justify-center z-50">
             <Alert class="max-w-[50%]">
-              <AlertTitle class="text-2xl">{error()?.title}</AlertTitle>
-              <AlertDescription>{error()?.message}</AlertDescription>
+              <AlertTitle class="text-2xl">{chatStore.error?.title}</AlertTitle>
+              <AlertDescription>{chatStore.error?.message}</AlertDescription>
             </Alert>
           </div>
         </Show>

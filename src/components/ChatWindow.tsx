@@ -10,18 +10,18 @@ import {
 } from "../api/assistant";
 import {
   AIRole,
-  type ChatMessage,
   type Assistant,
-  type Thread,
+  type ChatStore,
+  type SetChatStore,
 } from "../types";
 
 interface ErrorMessageProps {
-  activeAssistant: () => Assistant | undefined;
+  activeAssistant: Assistant | null;
 }
 
 const ErrorMessage = ({ activeAssistant }: ErrorMessageProps) => {
   return (
-    <Show when={activeAssistant() === undefined}>
+    <Show when={activeAssistant === undefined}>
       <div class="flex justify-center p-4">
         <p class="border-solid border-2 border-yellow-300 bg-yellow-100 p-4 rounded dark:text-black">
           Chat will be disbaled until an assistant is selected.
@@ -32,32 +32,17 @@ const ErrorMessage = ({ activeAssistant }: ErrorMessageProps) => {
 };
 
 interface ChatWindowProps {
-  activeAssistant: () => Assistant | undefined;
-  currentMessage: () => string;
-  setCurrentMessage: (val: string) => void;
-  assistantResponse: () => string;
-  setAssistantResponse: (val: string) => void;
-  chatHistory: () => ChatMessage[];
-  setChatHistory: (val: ChatMessage[]) => void;
-  activeThread: () => Thread | undefined;
+  chatStore: ChatStore;
+  setChatStore: SetChatStore;
 }
 
-const ChatWindow = ({
-  activeAssistant,
-  currentMessage,
-  setCurrentMessage,
-  assistantResponse,
-  setAssistantResponse,
-  chatHistory,
-  setChatHistory,
-  activeThread,
-}: ChatWindowProps) => {
+const ChatWindow = ({ chatStore, setChatStore }: ChatWindowProps) => {
   const [assistantLoading, setAssistantLoading] = createSignal<boolean>(false);
   const [chatCost, setChatCost] = createSignal<number>(0);
 
   const calculateCost = async (tokens: [number, number]) => {
-    const assistant = activeAssistant();
-    if (assistant === undefined) return;
+    const assistant = chatStore.activeAssistant;
+    if (assistant === null) return;
     const model = assistant.model;
     const pricing = await getModelPricing();
     if (!pricing) return;
@@ -69,7 +54,7 @@ const ChatWindow = ({
   };
 
   const addMessageToHistory = async (role: AIRole, message: string) => {
-    const currentHistory = chatHistory();
+    const currentHistory = chatStore.chatHistory;
     const lastRole =
       currentHistory.length > 0
         ? currentHistory[currentHistory.length - 1].role
@@ -82,7 +67,7 @@ const ChatWindow = ({
         content: message,
       });
 
-      setChatHistory(newHistory);
+      setChatStore("chatHistory", newHistory);
     };
 
     if (message !== "" && lastRole !== role) {
@@ -93,28 +78,28 @@ const ChatWindow = ({
   };
 
   createEffect(async () => {
-    if (!assistantLoading() && currentMessage() !== "") {
-      await addMessageToHistory(AIRole.USER, currentMessage());
+    if (!assistantLoading() && chatStore.currentMessage !== "") {
+      await addMessageToHistory(AIRole.USER, chatStore.currentMessage);
       setAssistantLoading(true);
-      setCurrentMessage("");
+      setChatStore("currentMessage", "");
     }
   });
 
   createEffect(async () => {
-    if (assistantLoading() && assistantResponse() !== "") {
-      await addMessageToHistory(AIRole.ASSISTANT, assistantResponse());
+    if (assistantLoading() && chatStore.assistantResponse !== "") {
+      await addMessageToHistory(AIRole.ASSISTANT, chatStore.assistantResponse);
       setAssistantLoading(false);
-      setAssistantResponse("");
+      setChatStore("assistantResponse", "");
     }
   });
 
   createEffect(async () => {
-    const currentHistory = chatHistory();
+    const currentHistory = chatStore.chatHistory;
     const history = await countTokens(currentHistory);
 
     if (currentHistory.length > 1) {
       if (JSON.stringify(history) !== JSON.stringify(currentHistory)) {
-        setChatHistory(history);
+        setChatStore("chatHistory", history);
       }
       const tokens = await countAllTokens(history);
       await calculateCost(tokens);
@@ -123,11 +108,11 @@ const ChatWindow = ({
 
   createEffect(async () => {
     try {
-      const thread = activeThread();
-      if (thread === undefined) return null;
+      const thread = chatStore.activeThread;
+      if (thread === null) return null;
       let history = await getHistory(thread);
       history = history.reverse();
-      setChatHistory(history);
+      setChatStore("chatHistory", history);
     } catch (e) {
       console.error(e);
     }
@@ -135,7 +120,13 @@ const ChatWindow = ({
 
   return (
     <>
-      <Show when={chatCost() > 0 && activeThread() && chatHistory().length > 0}>
+      <Show
+        when={
+          chatCost() > 0 &&
+          chatStore.activeThread &&
+          chatStore.chatHistory.length > 0
+        }
+      >
         <div class="flex justify-end p-4">
           <p class="border-solid border-2 border-green-300 bg-green-100 p-4 rounded dark:text-black">
             Chat Cost: ${chatCost()}
@@ -147,10 +138,12 @@ const ChatWindow = ({
           <div class="space-y-4 overflow-y-scroll overflow-x-hidden flex-grow shadowflex flex-col shadow-lg rounded-lg transition-all duration-300 ease-in-out max-h-45">
             <div class="flex flex-col justify-center self-center border-none rounded-lg">
               <Show
-                when={activeAssistant() !== undefined}
-                fallback={<ErrorMessage activeAssistant={activeAssistant} />}
+                when={chatStore.activeAssistant !== null}
+                fallback={
+                  <ErrorMessage activeAssistant={chatStore.activeAssistant} />
+                }
               >
-                <Index each={chatHistory()}>
+                <Index each={chatStore.chatHistory}>
                   {(entry) => {
                     switch (entry().role) {
                       case AIRole.USER:

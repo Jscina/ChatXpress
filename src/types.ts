@@ -53,3 +53,18 @@ export type Error = {
   title: string;
   message: string;
 };
+
+export type ChatStore = {
+  assistantResponse: string;
+  currentMessage: string;
+  activeAssistant: Assistant | null;
+  activeThread: Thread | null;
+  chatHistory: ChatMessage[];
+  apiKey: string;
+  error: Error | null;
+};
+
+export type SetChatStore = (
+  key: keyof ChatStore,
+  value: ChatStore[keyof ChatStore],
+) => void;

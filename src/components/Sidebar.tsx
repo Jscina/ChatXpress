@@ -3,33 +3,21 @@ import clsx from "clsx";
 import UserProfile from "./UserProfile";
 import HistoryItem from "./HistoryItem";
 import { Button } from "./ui/button";
-import type { Thread, ChatMessage, Error } from "../types";
+import type { Thread, SetChatStore, ChatStore } from "../types";
 import { listThreads } from "../api/database";
 
 interface SidebarProps {
   setSidebarOpen: (val: boolean) => void;
   isSidebarOpen: () => boolean;
-  activeThread: () => Thread | undefined;
-  setActiveThread: (val: Thread | undefined) => void;
-  chatHistory: () => ChatMessage[];
-  setChatHistory: (val: ChatMessage[]) => void;
-  setApiKey: (val: string) => void;
-  apiKey: () => string;
-  error: () => Error | undefined;
-  setError: (error: Error | undefined) => void;
+  chatStore: ChatStore;
+  setChatStore: SetChatStore;
 }
 
 const Sidebar = ({
   setSidebarOpen,
   isSidebarOpen,
-  activeThread,
-  setActiveThread,
-  chatHistory,
-  setChatHistory,
-  setApiKey,
-  apiKey,
-  error,
-  setError,
+  chatStore,
+  setChatStore,
 }: SidebarProps) => {
   const [history, setHistory] = createSignal<Thread[] | null>(null);
   const toggleSidebar = () => {
@@ -37,12 +25,12 @@ const Sidebar = ({
   };
 
   const handleNewChat = () => {
-    setActiveThread(undefined);
-    setChatHistory([]);
+    setChatStore("activeThread", null);
+    setChatStore("chatHistory", []);
   };
 
   createEffect(async () => {
-    if (!activeThread() || chatHistory().length > 0) {
+    if (!chatStore.activeThread || chatStore.chatHistory.length > 0) {
       const threads = await listThreads();
       setHistory(threads);
     }
@@ -89,10 +77,9 @@ const Sidebar = ({
                 return (
                   <HistoryItem
                     thread={message}
-                    activeThread={activeThread}
-                    setChatHistory={setChatHistory}
                     setHistory={setHistory}
-                    setActiveThread={setActiveThread}
+                    chatStore={chatStore}
+                    setChatStore={setChatStore}
                   />
                 );
               }
@@ -102,12 +89,7 @@ const Sidebar = ({
         <div class="flex-none">
           <hr />
           <div class="flex flex-col space-y-2 p-4 mb-auto">
-            <UserProfile
-              apiKey={apiKey}
-              setApiKey={setApiKey}
-              error={error}
-              setError={setError}
-            />
+            <UserProfile chatStore={chatStore} setChatStore={setChatStore} />
           </div>
         </div>
       </nav>

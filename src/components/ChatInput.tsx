@@ -6,23 +6,14 @@ import { conversation } from "../api/assistant";
 import { createThread } from "../api/database";
 
 import clsx from "clsx";
-import type { Assistant, Thread } from "../types";
+import type { ChatStore, SetChatStore } from "../types";
 
 interface ChatInputProps {
-  setCurrentMessage: (message: string) => void;
-  activeAssistant: () => Assistant | undefined;
-  setAssistantResponse: (val: string) => void;
-  setActiveThread: (val: Thread) => void;
-  activeThread: () => Thread | undefined;
+  chatStore: ChatStore;
+  setChatStore: SetChatStore;
 }
 
-const ChatInput = ({
-  setCurrentMessage,
-  activeAssistant,
-  setAssistantResponse,
-  setActiveThread,
-  activeThread,
-}: ChatInputProps) => {
+const ChatInput = ({ chatStore, setChatStore }: ChatInputProps) => {
   const [messageRef, setMessageRef] = createSignal<HTMLTextAreaElement>();
   const [messageInput, setMessageInput] = createSignal("");
   const [disabled, isDisabled] = createSignal<boolean>(false);
@@ -37,20 +28,20 @@ const ChatInput = ({
       textArea.value = "";
       setMessageInput("");
     }
-    if (promptInput !== "") setCurrentMessage(promptInput);
+    if (promptInput !== "") setChatStore("currentMessage", promptInput);
 
-    const assistant = activeAssistant();
-    const thread = activeThread();
+    const assistant = chatStore.activeAssistant;
+    const thread = chatStore.activeThread;
     if (!assistant) return;
 
     const response = await conversation(promptInput, assistant, thread);
-    setAssistantResponse(response.content);
+    setChatStore("assistantResponse", response.content);
 
-    if (activeThread()?.id === response.thread.id) {
+    if (chatStore.activeThread?.id === response.thread.id) {
       return;
-    } else if (activeThread() === undefined) {
+    } else if (chatStore.activeThread === null) {
       await createThread(response.thread);
-      setActiveThread(response.thread);
+      setChatStore("activeThread", response.thread);
     }
   };
 
@@ -74,7 +65,7 @@ const ChatInput = ({
   });
 
   createEffect(() => {
-    if (activeAssistant() === undefined) {
+    if (chatStore.activeAssistant === null) {
       isDisabled(true);
     } else {
       isDisabled(false);
@@ -101,7 +92,7 @@ const ChatInput = ({
               "w-10 h-10 p-2 rounded-md bg-green-500 hover:bg-green-400 text-white flex items-center justify-center",
               {
                 "disabled:opacity-50 disabled:pointer-events-none":
-                  activeAssistant() === undefined,
+                  chatStore.activeAssistant === null,
               },
             )}
           >

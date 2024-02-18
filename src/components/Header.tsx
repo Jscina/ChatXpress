@@ -10,24 +10,20 @@ import {
 } from "./ui/select";
 
 import { Button } from "./ui/button";
-import type { Assistant, Error } from "../types";
+import type { Assistant, ChatStore, SetChatStore } from "../types";
 
 interface HeaderProps {
-  setActiveAssistant: (assistant: Assistant) => void;
   setSidebarOpen: (val: boolean) => void;
   isSidebarOpen: () => boolean;
-  apiKey: () => string;
-  error: () => Error | undefined;
-  setError: (error: Error | undefined) => void;
+  chatStore: ChatStore;
+  setChatStore: SetChatStore;
 }
 
 const Header = ({
   setSidebarOpen,
   isSidebarOpen,
-  setActiveAssistant,
-  apiKey,
-  error,
-  setError,
+  chatStore,
+  setChatStore,
 }: HeaderProps) => {
   const [selectedAssistant, setSelectedAssistant] = createSignal<string>("");
   const [assistants, setAssistants] = createSignal<string[]>([]);
@@ -47,7 +43,7 @@ const Header = ({
     const assistant = available.find(
       (value) => value.name === selectedAssistant(),
     )!;
-    setActiveAssistant(assistant);
+    setChatStore("activeAssistant", assistant);
   });
 
   const fetchAssistants = async () => {
@@ -56,16 +52,15 @@ const Header = ({
       setAvailableAssistants(assistants);
       setAssistants(assistants.map((assistant) => assistant.name));
     } catch (e: any) {
-      setError({
+      setChatStore("error", {
         title: "Error fetching assistants",
-        message: e,
+        message: e.message,
       });
-      console.log(error());
     }
   };
 
   createEffect(async () => {
-    if (apiKey() === "") {
+    if (chatStore.apiKey === "") {
       setAssistants([]);
     } else {
       // There's a delay in the API key being set

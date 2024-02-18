@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogDescription } from "./ui/dialog";
 import { deleteThread, updateThread, listThreads } from "../api/database";
-import type { ChatMessage, Thread } from "../types";
+import type { ChatStore, SetChatStore, Thread } from "../types";
 
 interface EditableItemProps {
   name: string;
@@ -68,10 +68,9 @@ interface ConfirmDeleteProps {
   open: () => boolean;
   setOpen: (val: boolean) => void;
   setDisabled: (val: boolean) => void;
-  activeThread: () => Thread | undefined;
-  setActiveThread: (val: Thread | undefined) => void;
-  setChatHistory: (val: ChatMessage[]) => void;
-  setHistory: (val: Thread[] | null) => void;
+  setHistory: (val: Thread[]) => void;
+  chatStore: ChatStore;
+  setChatStore: SetChatStore;
 }
 
 const ConfirmDelete = ({
@@ -79,16 +78,15 @@ const ConfirmDelete = ({
   open,
   setOpen,
   setDisabled,
-  activeThread,
-  setActiveThread,
-  setChatHistory,
   setHistory,
+  chatStore,
+  setChatStore,
 }: ConfirmDeleteProps) => {
   const handleDelete = async () => {
     setDisabled(true);
-    if (activeThread()?.id === thread.id) {
-      setActiveThread(undefined);
-      setChatHistory([]);
+    if (chatStore.activeThread?.id === thread.id) {
+      setChatStore("activeThread", null);
+      setChatStore("chatHistory", []);
       const threads = await listThreads();
       setHistory(threads.filter((t) => t.id !== thread.id));
     }
@@ -136,19 +134,19 @@ interface NonEditableItemProps {
   thread: Thread;
   toggleEditable: () => void;
   disabled: () => boolean;
-  setActiveThread: (val: Thread | undefined) => void;
   setOpen: (val: boolean) => void;
+  setChatStore: SetChatStore;
 }
 
 const NonEditableItem = ({
   thread,
   toggleEditable,
   disabled,
-  setActiveThread,
   setOpen,
+  setChatStore,
 }: NonEditableItemProps) => {
   const loadHistory = () => {
-    setActiveThread(thread);
+    setChatStore("activeThread", thread);
   };
 
   const deleteHistory = async () => {
@@ -185,18 +183,16 @@ const NonEditableItem = ({
 
 interface HistoryItemProps {
   thread: Thread;
-  activeThread: () => Thread | undefined;
-  setHistory: (val: Thread[] | null) => void;
-  setChatHistory: (val: ChatMessage[]) => void;
-  setActiveThread: (val: Thread | undefined) => void;
+  setHistory: (val: Thread[]) => void;
+  chatStore: ChatStore;
+  setChatStore: SetChatStore;
 }
 
 const HistoryItem = ({
   thread,
-  activeThread,
-  setActiveThread,
   setHistory,
-  setChatHistory,
+  chatStore,
+  setChatStore,
 }: HistoryItemProps) => {
   const [editable, setEditable] = createSignal(false);
   const [name, setName] = createSignal(thread.name);
@@ -228,7 +224,7 @@ const HistoryItem = ({
               toggleEditable={toggleEditable}
               disabled={disabled}
               setOpen={setOpen}
-              setActiveThread={setActiveThread}
+              setChatStore={setChatStore}
             />
           </Show>
         </div>
@@ -238,10 +234,9 @@ const HistoryItem = ({
         open={open}
         setOpen={setOpen}
         setDisabled={setDisabled}
-        activeThread={activeThread}
-        setChatHistory={setChatHistory}
         setHistory={setHistory}
-        setActiveThread={setActiveThread}
+        chatStore={chatStore}
+        setChatStore={setChatStore}
       />
     </>
   );

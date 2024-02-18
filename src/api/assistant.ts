@@ -99,7 +99,7 @@ export async function updateApiKey(apiKey: string): Promise<void> {
 export async function conversation(
   prompt: string,
   assistant: Assistant,
-  thread?: Thread,
+  thread: Thread | null,
 ): Promise<Chat> {
   if (prompt === "") return { content: "", thread: thread } as Chat;
   try {

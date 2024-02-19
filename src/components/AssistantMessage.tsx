@@ -9,7 +9,7 @@ const ErrorMessage = () => {
       <div class="flex p-2 max-w-[50%] w-full">
         <div class="flex">
           <p class="p-4 border-solid border-red-600 bg-red-400 rounded">
-            An error has occured
+            An unknown error has occured
           </p>
         </div>
       </div>

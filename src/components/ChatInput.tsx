@@ -1,4 +1,4 @@
-import { createSignal, createEffect } from "solid-js";
+import { createSignal, createEffect, Show } from "solid-js";
 
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
@@ -114,14 +114,16 @@ const ChatInput = ({ chatStore, setChatStore }: ChatInputProps) => {
 
   return (
     <>
-      <Button
-        type="button"
-        class="mb-2 bg-transparent hover:bg-neutral-600 border-solid border dark:border-neutral-600 shadow-md border-neutral-300"
-        onClick={regenResponse}
-      >
-        <p class="mr-1">Regenerate</p>
-        <i class="fa-regular fa-rotate-right"></i>
-      </Button>
+      <Show when={chatStore.chatHistory.length > 0}>
+        <Button
+          type="button"
+          class="mb-2 bg-transparent hover:bg-neutral-600 border-solid border dark:border-neutral-600 shadow-md border-neutral-300"
+          onClick={regenResponse}
+        >
+          <p class="mr-1">Regenerate</p>
+          <i class="fa-regular fa-rotate-right"></i>
+        </Button>
+      </Show>
       <div class="flex flex-col mb-12 items-center max-w-[50%] w-full min-w-min py-2 px-4 border rounded-xl shadow-md border-neutral-300  dark:bg-neutral-600 dark:border-neutral-800 dark:shadow-lg transition-all duration-300 ease-in-out">
         <form class="m-0 w-full flex flex-col gap-2" onSubmit={sendMessage}>
           <div class="flex items-center space-x-2">
